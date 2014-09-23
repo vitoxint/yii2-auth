@@ -1,33 +1,37 @@
 <?php
 /* @var $this AssignmentController */
-/* @var $dataProvider CActiveDataProvider */
 
+use yii\data\ActiveDataProvider;
+use yii\grid\GridView;
+
+/* @var $dataProvider ActiveDataProvider */
+
+/*
 $this->breadcrumbs = array(
     Yii::t('AuthModule.main', 'Assignments'),
 );
+ */
 ?>
 
 <h1><?php echo Yii::t('AuthModule.main', 'Assignments'); ?></h1>
 
-<?php $this->widget(
-    'bootstrap.widgets.TbGridView',
-    array(
-        'type' => 'striped hover',
+<?= GridView::widget(
+    [
         'dataProvider' => $dataProvider,
         'emptyText' => Yii::t('AuthModule.main', 'No assignments found.'),
-        'template' => "{items}\n{pager}",
-        'columns' => array(
-            array(
+        'layout' => "{items}\n{pager}",
+        'columns' => [
+            [
                 'header' => Yii::t('AuthModule.main', 'User'),
-                'class' => 'AuthAssignmentNameColumn',
-            ),
-            array(
+                'class' => 'auth\widgets\AuthAssignmentNameColumn',
+            ],
+            [
                 'header' => Yii::t('AuthModule.main', 'Assigned items'),
-                'class' => 'AuthAssignmentItemsColumn',
-            ),
-            array(
-                'class' => 'AuthAssignmentViewColumn',
-            ),
-        ),
-    )
+                'class' => 'auth\widgets\AuthAssignmentItemsColumn',
+            ],
+            [
+                'class' => 'auth\widgets\AuthAssignmentViewColumn',
+            ],
+        ],
+    ]
 ); ?>

@@ -7,6 +7,11 @@
  * @package auth.widgets
  */
 
+namespace auth\widgets;
+
+use yii\helpers\Html;
+use Yii;
+
 /**
  * Grid column for displaying the description for an authorization item row.
  */
@@ -17,32 +22,30 @@ class AuthItemDescriptionColumn extends AuthItemColumn
      */
     public function init()
     {
-        if (isset($this->htmlOptions['class'])) {
-            $this->htmlOptions['class'] .= ' item-description-column';
+        if (isset($this->options['class'])) {
+            $this->options['class'] .= ' item-description-column';
         } else {
-            $this->htmlOptions['class'] = 'item-description-column';
+            $this->options['class'] = 'item-description-column';
         }
     }
 
     /**
-     * Renders the data cell content.
-     * @param integer $row the row number (zero-based).
-     * @param mixed $data the data associated with the row.
+     * @inheritdoc
      */
-    protected function renderDataCellContent($row, $data)
+    protected function renderDataCellContent($model, $key, $index)
     {
-        /* @var $am CAuthManager|AuthBehavior */
-        $am = Yii::app()->getAuthManager();
+        /* @var $am \yii\rbac\BaseManager|AuthBehavior */
+        $am = Yii::$app->getAuthManager();
 
-        $linkCssClass = $this->active || $am->hasParent($this->itemName, $data['name']) || $am->hasChild(
+        $linkCssClass = $this->active || $am->hasParent($this->itemName, $model['name']) || $am->hasChild(
             $this->itemName,
-            $data['name']
+            $model['name']
         ) ? 'active' : 'disabled';
 
         /* @var $controller AuthItemController */
-        $controller = $this->grid->getController();
+        $controller = $this->grid->view->context;
 
-        echo CHtml::link(
+        return Html::a(
             $data['item']->description,
             array('/auth/' . $controller->getItemControllerId($data['item']->type) . '/view', 'name' => $data['name']),
             array('class' => $linkCssClass)

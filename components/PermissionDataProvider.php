@@ -7,6 +7,8 @@
  * @package auth.components
  */
 
+namespace auth\components;
+
 /**
  * Data provider for listing permissions.
  */

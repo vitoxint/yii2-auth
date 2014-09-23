@@ -7,7 +7,7 @@
  * @package auth.components
  */
 
-Yii::import('auth.components.ICachedAuthManager');
+namespace auth\components;
 
 /**
  * Caching layer for CDbAuthManager that allows for caching access checks.
@@ -95,6 +95,6 @@ class CachedDbAuthManager extends CDbAuthManager implements ICachedAuthManager
      */
     protected function getCache()
     {
-        return $this->cachingDuration > 0 && $this->cacheID !== false ? Yii::app()->getComponent($this->cacheID) : null;
+        return $this->cachingDuration > 0 && $this->cacheID !== false ? Yii::$app->getComponent($this->cacheID) : null;
     }
 }

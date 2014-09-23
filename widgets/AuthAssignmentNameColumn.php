@@ -7,6 +7,10 @@
  * @package auth.widgets
  */
 
+namespace auth\widgets;
+
+use yii\helpers\Html;
+
 /**
  * Grid column for displaying the name of the user for an assignment row.
  */
@@ -17,20 +21,18 @@ class AuthAssignmentNameColumn extends AuthAssignmentColumn
      */
     public function init()
     {
-        if (isset($this->htmlOptions['class'])) {
-            $this->htmlOptions['class'] .= ' name-column';
+        if (isset($this->options['class'])) {
+            $this->options['class'] .= ' name-column';
         } else {
-            $this->htmlOptions['class'] = 'name-column';
+            $this->options['class'] = 'name-column';
         }
     }
 
     /**
-     * Renders the data cell content.
-     * @param integer $row the row number (zero-based).
-     * @param mixed $data the data associated with the row.
+     * @inheritdoc
      */
-    protected function renderDataCellContent($row, $data)
+    protected function renderDataCellContent($model, $key, $index)
     {
-        echo CHtml::link(CHtml::value($data, $this->nameColumn), array('view', 'id' => $data->{$this->idColumn}));
+        return Html::a($model->{$this->nameColumn}, ['view', 'id' => $model->{$this->idColumn}]);
     }
 }

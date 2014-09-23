@@ -5,13 +5,19 @@
  * @copyright Copyright &copy; Christoffer Niska 2012-
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  * @package auth
- * @version 1.7.0
+ * @version 2.0.0
  */
 
+namespace auth;
+
+use Yii;
+use yii\base\Exception;
+use yii\web\HttpException;
+
 /**
- * Web module for managing Yii's built-in authorization manager (CAuthManager).
+ * Web module for managing Yii's built-in authorization manager (\yii\rbac\BaseManager).
  */
-class AuthModule extends CWebModule
+class Module extends \yii\base\Module
 {
     /**
      * @var boolean whether to enable the RBAC strict mode.
@@ -22,7 +28,7 @@ class AuthModule extends CWebModule
      * @var string name of the user model class.
      * Change this if your user model name is different than the default value.
      */
-    public $userClass = 'User';
+    public $userClass = 'app\models\User';
     /**
      * @var string name of the user id column.
      * Change this if the id column in your user table is different than the default value.
@@ -37,7 +43,7 @@ class AuthModule extends CWebModule
      * @var string the application layout.
      * Change this if you wish to use a different layout with the module.
      */
-    public $defaultLayout = 'application.views.layouts.main';
+    public $defaultLayout = '@app/views/layouts/main';
     /**
      * @var array map of flash message keys to use for the module.
      */
@@ -64,14 +70,8 @@ class AuthModule extends CWebModule
      */
     public function init()
     {
-        $this->setImport(
-            array(
-                'auth.components.*',
-                'auth.controllers.*',
-                'auth.models.*',
-                'auth.widgets.*',
-            )
-        );
+        // attach behavior here
+        Yii::$app->authManager->attachBehavior('auth', 'auth\components\AuthBehavior');
 
         $this->registerCss();
 
@@ -87,12 +87,33 @@ class AuthModule extends CWebModule
 
         if (isset($this->viewDir)) {
             if (strpos($this->viewDir, '.')) {
-                $this->viewDir = Yii::getPathOfAlias($this->viewDir);
+                $this->viewDir = Yii::getAlias($this->viewDir);
             }
 
             $this->setLayoutPath($this->viewDir . DIRECTORY_SEPARATOR . 'layouts');
             $this->setViewPath($this->viewDir);
         }
+
+        $this->registerTranslations();
+
+        parent::init();
+    }
+
+    /**
+     * Register i18n messages.
+     *
+     * @return void
+     */
+    public function registerTranslations()
+    {
+        Yii::$app->i18n->translations['AuthModule*'] = [
+            'class' => 'yii\i18n\PhpMessageSource',
+            'sourceLanguage' => 'ru-RU',
+            'basePath' => '@vendor/crisu83/yii-auth/messages',
+            'fileMap' => [
+                    'AuthModule.main' => 'main.php'
+            ],
+        ];
     }
 
     /**
@@ -100,20 +121,20 @@ class AuthModule extends CWebModule
      */
     public function registerCss()
     {
-        Yii::app()->clientScript->registerCssFile($this->getAssetsUrl() . '/css/auth.css');
+        Yii::$app->view->registerCssFile($this->getAssetsUrl()[0] . '/css/auth.css');
     }
 
     /**
      * The pre-filter for controller actions.
-     * @param CController $controller the controller.
-     * @param CAction $action the action.
+     * @param \yii\web\Controller $controller the controller.
+     * @param \yii\base\Action $action the action.
      * @return boolean whether the action should be executed.
-     * @throws CException|CHttpException if user is denied access.
+     * @throws Exception|HttpException if user is denied access.
      */
     public function beforeControllerAction($controller, $action)
     {
         if (parent::beforeControllerAction($controller, $action)) {
-            $user = Yii::app()->getUser();
+            $user = Yii::$app->getUser();
 
             if ($user instanceof AuthWebUser) {
                 if ($user->isAdmin) {
@@ -122,10 +143,10 @@ class AuthModule extends CWebModule
                     $user->loginRequired();
                 }
             } else {
-                throw new CException('WebUser component is not an instance of AuthWebUser.');
+                throw new Exception('WebUser component is not an instance of AuthWebUser.');
             }
         }
-        throw new CHttpException(401, Yii::t('AuthModule.main', 'Access denied.'));
+        throw new HttpException(401, Yii::t('AuthModule.main', 'Access denied.'));
     }
 
     /**
@@ -137,8 +158,8 @@ class AuthModule extends CWebModule
         if (isset($this->_assetsUrl)) {
             return $this->_assetsUrl;
         } else {
-            $assetsPath = Yii::getPathOfAlias('auth.assets');
-            $assetsUrl = Yii::app()->assetManager->publish($assetsPath, false, -1, $this->forceCopyAssets);
+            $assetsPath = Yii::getAlias(__DIR__ . '/assets');
+            $assetsUrl = Yii::$app->assetManager->publish($assetsPath, false, -1, $this->forceCopyAssets);
 
             return $this->_assetsUrl = $assetsUrl;
         }
@@ -150,6 +171,6 @@ class AuthModule extends CWebModule
      */
     public function getVersion()
     {
-        return '1.7.0';
+        return '2.0.0';
     }
 }

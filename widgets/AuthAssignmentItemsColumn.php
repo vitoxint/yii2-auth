@@ -7,6 +7,11 @@
  * @package auth.widgets
  */
 
+namespace auth\widgets;
+
+use sbuilder\helpers\Dev;
+use Yii;
+
 /**
  * Grid column for displaying the authorization items for an assignment row.
  */
@@ -17,31 +22,31 @@ class AuthAssignmentItemsColumn extends AuthAssignmentColumn
      */
     public function init()
     {
-        if (isset($this->htmlOptions['class'])) {
-            $this->htmlOptions['class'] .= ' assignment-items-column';
+        if (isset($this->options['class'])) {
+            $this->options['class'] .= ' assignment-items-column';
         } else {
-            $this->htmlOptions['class'] = 'assignment-items-column';
+            $this->options['class'] = 'assignment-items-column';
         }
     }
 
     /**
-     * Renders the data cell content.
-     * @param integer $row the row number (zero-based).
-     * @param mixed $data the data associated with the row.
+     * @inheritdoc
      */
-    protected function renderDataCellContent($row, $data)
+    protected function renderDataCellContent($model, $key, $index)
     {
-        /* @var $am CAuthManager|AuthBehavior */
-        $am = Yii::app()->getAuthManager();
+        /* @var $am \yii\rbac\BaseManager|\auth\components\AuthBehavior */
+        $am = Yii::$app->getAuthManager();
 
-        /* @var $controller AssignmentController */
-        $controller = $this->grid->getController();
+        /* @var $controller \auth\controllers\AssignmentController */
+        $controller = $this->grid->view->context;
 
-        $assignments = $am->getAuthAssignments($data->{$this->idColumn});
+        $assignments = $am->getAssignments($model->{$this->idColumn});
         $permissions = $am->getItemsPermissions(array_keys($assignments));
         foreach ($permissions as $itemPermission) {
-            echo $itemPermission['item']->description;
-            echo ' <small>' . $controller->getItemTypeText($itemPermission['item']->type, false) . '</small><br />';
+            $html = $itemPermission['item']->description;
+            $html .= ' <small>' . $controller->getItemTypeText($itemPermission['item']->type, false) . '</small><br />';
+
+            return $html;
         }
     }
 }

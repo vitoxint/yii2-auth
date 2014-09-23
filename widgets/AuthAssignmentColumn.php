@@ -7,7 +7,10 @@
  * @package auth.widgets
  */
 
-Yii::import('zii.widgets.grid.CGridColumn');
+namespace auth\widgets;
+
+use sbuilder\helpers\Dev;
+use yii\grid\Column;
 
 /**
  * Grid column for displaying assignment related data.
@@ -15,7 +18,7 @@ Yii::import('zii.widgets.grid.CGridColumn');
  * @property string $idColumn name of the user id column.
  * @property string $nameColumn name of the user name column.
  */
-class AuthAssignmentColumn extends CGridColumn
+class AuthAssignmentColumn extends Column
 {
     /**
      * @var integer the user id.
@@ -28,7 +31,7 @@ class AuthAssignmentColumn extends CGridColumn
      */
     protected function getIdColumn()
     {
-        return $this->grid->controller->module->userIdColumn;
+        return $this->grid->view->context->module->userIdColumn;
     }
 
     /**
@@ -37,6 +40,6 @@ class AuthAssignmentColumn extends CGridColumn
      */
     protected function getNameColumn()
     {
-        return $this->grid->controller->module->userNameColumn;
+        return $this->grid->view->context->module->userNameColumn;
     }
 }

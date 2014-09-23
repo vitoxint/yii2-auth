@@ -7,6 +7,8 @@
  * @package auth.controllers
  */
 
+namespace auth\controllers;
+
 /**
  * Controller for task related actions.
  */

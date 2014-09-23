@@ -7,12 +7,18 @@
  * @package auth.components
  */
 
+namespace auth\components;
+
+use sbuilder\helpers\Dev;
+use yii\base\Behavior;
+use yii\rbac\Item;
+
 /**
  * Auth module behavior for the authorization manager.
  *
- * @property CAuthManager|IAuthManager $owner The authorization manager.
+ * @property \yii\rbac\BaseManager|IAuthManager $owner The authorization manager.
  */
-class AuthBehavior extends CBehavior
+class AuthBehavior extends Behavior
 {
     /**
      * @var array cached relations between the auth items.
@@ -221,25 +227,25 @@ class AuthBehavior extends CBehavior
 
     /**
      * Returns the permission tree for the given items.
-     * @param CAuthItem[] $items items to process. If omitted the complete tree will be returned.
+     * @param Item[] $items items to process. If omitted the complete tree will be returned.
      * @param integer $depth current depth.
      * @return array the permissions.
      */
     private function getPermissions($items = null, $depth = 0)
     {
-        $permissions = array();
+        $permissions = [];
 
         if ($items === null) {
-            $items = $this->owner->getAuthItems();
+            $items = $this->owner->getPermissions();
         }
 
         foreach ($items as $itemName => $item) {
-            $permissions[$itemName] = array(
+            $permissions[$itemName] = [
                 'name' => $itemName,
                 'item' => $item,
-                'children' => $this->getPermissions($item, $depth + 1),
+                //'children' => $this->getChildren($item),//getPermissions($item, $depth + 1),
                 'depth' => $depth,
-            );
+            ];
         }
 
         return $permissions;
@@ -253,7 +259,7 @@ class AuthBehavior extends CBehavior
     private function getItemPermissions($itemName)
     {
         $item = $this->owner->getAuthItem($itemName);
-        return $item instanceof CAuthItem ? $this->getPermissions($item->getChildren()) : array();
+        return $item instanceof CAuthItem ? $this->getPermissions($item->getChildren()) : [];
     }
 
     /**
@@ -263,7 +269,7 @@ class AuthBehavior extends CBehavior
      */
     public function getItemsPermissions($names)
     {
-        $permissions = array();
+        $permissions = [];
 
         $items = $this->getPermissions();
         $flat = $this->flattenPermissions($items);
@@ -284,7 +290,7 @@ class AuthBehavior extends CBehavior
      */
     public function flattenPermissions($permissions)
     {
-        $flattened = array();
+        $flattened = [];
         foreach ($permissions as $itemName => $itemPermissions) {
             $flattened[$itemName] = $itemPermissions;
 

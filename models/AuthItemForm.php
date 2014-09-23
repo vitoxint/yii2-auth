@@ -7,10 +7,14 @@
  * @package auth.models
  */
 
+namespace auth\models;
+
+use yii\base\Model;
+
 /**
  * Form model for updating an authorization item.
  */
-class AuthItemForm extends CFormModel
+class AuthItemForm extends Model
 {
     /**
      * @var string item name.

@@ -7,6 +7,8 @@
  * @package auth.components
  */
 
+namespace auth\components;
+
 /**
  * Web user that allows for passing access checks when enlisted as an administrator.
  *

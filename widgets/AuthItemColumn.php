@@ -7,12 +7,14 @@
  * @package auth.widgets
  */
 
-Yii::import('zii.widgets.grid.CGridColumn');
+namespace auth\widgets;
+
+use yii\grid\Column;
 
 /**
  * Grid column for displaying authorization item related data.
  */
-class AuthItemColumn extends CGridColumn
+class AuthItemColumn extends Column
 {
     /**
      * @var string name of the item.

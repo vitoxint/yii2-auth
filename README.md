@@ -1,7 +1,7 @@
 yii-auth
 ========
 
-Auth is a module for the [Yii PHP framework](http://www.yiiframework.com) that provides a web user interface for Yii's built-in authorization manager (CAuthManager). 
+Auth is a module for the [Yii PHP framework](http://www.yiiframework.com) that provides a web user interface for Yii's built-in authorization manager (\yii\rbac\BaseManager).
 You can read more about Yii's authorization manager in the framework documentation under [Authentication and Authorization](http://www.yiiframework.com/doc/guide/1.1/en/topics.auth#role-based-access-control).
 
 Auth was developed to provide a modern and responsive user interface for managing user permissions in Yii projects.
@@ -80,10 +80,10 @@ Here's an example configuration for the component:
 
 ### Checking access
 
-When you wish to check if the current user has a certain permission you can use the ***CWebUser::checkAccess()*** method which can be access from anywhere in your application through ***Yii::app()*** like so:
+When you wish to check if the current user has a certain permission you can use the ***User::can()*** method which can be access from anywhere in your application through ***Yii::$app*** like so:
 
 ```php
-if (Yii::app()->user->checkAccess('itemName')) // itemName = name of the operation
+if (Yii::$app->user->can('itemName')) // itemName = name of the operation
 {
   // access is allowed.
 }

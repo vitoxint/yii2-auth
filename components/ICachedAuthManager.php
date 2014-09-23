@@ -7,6 +7,8 @@
  * @package auth.components
  */
 
+namespace auth\components;
+
 /**
  * Interface for cached authorization managers.
  */

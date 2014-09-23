@@ -7,6 +7,10 @@
  * @package auth.widgets
  */
 
+namespace auth\widgets;
+
+use Yii;
+
 /**
  * Grid column for displaying the type for an authorization item row.
  */
@@ -17,30 +21,28 @@ class AuthItemTypeColumn extends AuthItemColumn
      */
     public function init()
     {
-        if (isset($this->htmlOptions['class'])) {
-            $this->htmlOptions['class'] .= ' item-type-column';
+        if (isset($this->options['class'])) {
+            $this->options['class'] .= ' item-type-column';
         } else {
-            $this->htmlOptions['class'] = 'item-type-column';
+            $this->options['class'] = 'item-type-column';
         }
     }
 
     /**
-     * Renders the data cell content.
-     * @param integer $row the row number (zero-based).
-     * @param mixed $data the data associated with the row.
+     * @inheritdoc
      */
-    protected function renderDataCellContent($row, $data)
+    protected function renderDataCellContent($model, $key, $index)
     {
-        /* @var $am CAuthManager|AuthBehavior */
-        $am = Yii::app()->getAuthManager();
+        /* @var $am \yii\rbac\BaseManager|AuthBehavior */
+        $am = Yii::$app->getAuthManager();
 
-        $labelType = $this->active || $am->hasParent($this->itemName, $data['name']) || $am->hasChild(
+        $labelType = $this->active || $am->hasParent($this->itemName, $model['name']) || $am->hasChild(
             $this->itemName,
             $data['name']
         ) ? 'info' : '';
 
-        /* @var $controller AuthItemController */
-        $controller = $this->grid->getController();
+        /* @var $controller \auth\controllers\AuthItemController */
+        $controller = $this->grid->view->context;
 
         echo TbHtml::labelTb(
             $controller->getItemTypeText($data['item']->type),

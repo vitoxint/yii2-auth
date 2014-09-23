@@ -7,6 +7,11 @@
  * @package auth.components
  */
 
+namespace auth\filters;
+
+use yii\web\HttpException;
+use Yii;
+
 /**
  * Filter that automatically checks if the user has access to the current controller action.
  */
@@ -22,30 +27,30 @@ class AuthFilter extends CFilter
      * Performs the pre-action filtering.
      * @param CFilterChain $filterChain the filter chain that the filter is on.
      * @return boolean whether the filtering process should continue and the action should be executed.
-     * @throws CHttpException if the user is denied access.
+     * @throws HttpException if the user is denied access.
      */
     protected function preFilter($filterChain)
     {
         $itemName = '';
         $controller = $filterChain->controller;
 
-        /* @var $user CWebUser */
-        $user = Yii::app()->getUser();
+        /* @var $user \yii\web\User  */
+        $user = Yii::$app->getUser();
 
         if (($module = $controller->getModule()) !== null) {
             $itemName .= $module->getId() . '.';
-            if ($user->checkAccess($itemName . '*')) {
+            if ($user->can($itemName . '*')) {
                 return true;
             }
         }
 
         $itemName .= $controller->getId();
-        if ($user->checkAccess($itemName . '.*')) {
+        if ($user->can($itemName . '.*')) {
             return true;
         }
 
         $itemName .= '.' . $controller->action->getId();
-        if ($user->checkAccess($itemName, $this->params)) {
+        if ($user->can($itemName, $this->params)) {
             return true;
         }
 
@@ -53,6 +58,6 @@ class AuthFilter extends CFilter
             $user->loginRequired();
         }
 
-        throw new CHttpException(401, Yii::t('yii', 'You are not authorized to perform this action.'));
+        throw new HttpException(401, Yii::t('yii', 'You are not authorized to perform this action.'));
     }
 }

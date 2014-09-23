@@ -7,6 +7,10 @@
  * @package auth.widgets
  */
 
+namespace auth\widgets;
+
+use Yii;
+
 /**
  * Grid column for displaying the remove link for an authorization item row.
  */
@@ -31,8 +35,8 @@ class AuthItemRemoveColumn extends AuthItemColumn
      */
     protected function renderDataCellContent($row, $data)
     {
-        /* @var $am CAuthManager|AuthBehavior */
-        $am = Yii::app()->getAuthManager();
+        /* @var $am \yii\rbac\BaseManager|AuthBehavior */
+        $am = Yii::$app->getAuthManager();
 
         if ($am->hasParent($this->itemName, $data['name'])) {
             echo TbHtml::linkButton(

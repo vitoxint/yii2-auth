@@ -7,6 +7,8 @@
  * @package auth.widgets
  */
 
+namespace auth\widgets;
+
 /**
  * Grid column for displaying the revoke link for an assignment row.
  */
@@ -17,19 +19,17 @@ class AuthAssignmentRevokeColumn extends AuthAssignmentColumn
      */
     public function init()
     {
-        if (isset($this->htmlOptions['class'])) {
-            $this->htmlOptions['class'] .= ' actions-column';
+        if (isset($this->options['class'])) {
+            $this->options['class'] .= ' actions-column';
         } else {
-            $this->htmlOptions['class'] = 'actions-column';
+            $this->options['class'] = 'actions-column';
         }
     }
 
     /**
-     * Renders the data cell content.
-     * @param integer $row the row number (zero-based).
-     * @param mixed $data the data associated with the row.
+     * @inheritdoc
      */
-    protected function renderDataCellContent($row, $data)
+    protected function renderDataCellContent($model, $key, $index)
     {
         if ($this->userId !== null) {
             echo TbHtml::linkButton(
@@ -37,7 +37,7 @@ class AuthAssignmentRevokeColumn extends AuthAssignmentColumn
                 array(
                     'color' => TbHtml::BUTTON_COLOR_LINK,
                     'size' => TbHtml::BUTTON_SIZE_MINI,
-                    'url' => array('revoke', 'itemName' => $data['name'], 'userId' => $this->userId),
+                    'url' => array('revoke', 'itemName' => $model['name'], 'userId' => $this->userId),
                     'rel' => 'tooltip',
                     'title' => Yii::t('AuthModule.main', 'Revoke'),
                 )

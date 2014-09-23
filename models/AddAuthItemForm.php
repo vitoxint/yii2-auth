@@ -7,10 +7,15 @@
  * @package auth.models
  */
 
+namespace auth\models;
+
+use Yii;
+use yii\bootstrap\ActiveForm;
+
 /**
  * Form model for displaying a list of authorization items.
  */
-class AddAuthItemForm extends CFormModel
+class AddAuthItemForm extends ActiveForm
 {
     /**
      * @var array a list of authorization items.
@@ -23,9 +28,9 @@ class AddAuthItemForm extends CFormModel
      */
     public function attributeLabels()
     {
-        return array(
+        return [
             'items' => Yii::t('AuthModule.main', 'Items'),
-        );
+        ];
     }
 
     /**
@@ -35,7 +40,7 @@ class AddAuthItemForm extends CFormModel
     public function rules()
     {
         return array(
-            array('items', 'required'),
+            ['items', 'required'],
         );
     }
 }

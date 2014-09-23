@@ -7,11 +7,22 @@
  * @package auth.components
  */
 
+namespace auth\components;
+
+use auth\controllers\AssignmentController;
+use auth\controllers\OperationController;
+use auth\controllers\RoleController;
+use auth\controllers\TaskController;
+use yii\base\Exception;
+use yii\rbac\Item;
+use yii\web\Controller;
+use Yii;
+
 /**
  * Base controller for the module.
  * Note: Do NOT extend your controllers from this class!
  */
-abstract class AuthController extends CController
+abstract class AuthController extends Controller
 {
     /**
      * @var array context menu items. This property will be assigned to {@link CMenu::items}.
@@ -29,7 +40,7 @@ abstract class AuthController extends CController
     {
         parent::init();
         $this->layout = $this->module->defaultLayout;
-        $this->menu = $this->getSubMenu();
+        //$this->menu = $this->getSubMenu();
     }
 
     /**
@@ -37,27 +48,29 @@ abstract class AuthController extends CController
      * @param string $type the item type (0=operation, 1=task, 2=role).
      * @param boolean $plural whether to return the name in plural.
      * @return string the text.
-     * @throws CException if the item type is invalid.
+     * @throws Exception if the item type is invalid.
      */
     public function getItemTypeText($type, $plural = false)
     {
         // todo: change the default value for $plural to false.
         $n = $plural ? 2 : 1;
         switch ($type) {
-            case CAuthItem::TYPE_OPERATION:
+            /*case Item::TYPE_OPERATION:
                 $name = Yii::t('AuthModule.main', 'operation|operations', $n);
                 break;
 
-            case CAuthItem::TYPE_TASK:
+            case Item::TYPE_TASK:
                 $name = Yii::t('AuthModule.main', 'task|tasks', $n);
-                break;
+                break;*/
 
-            case CAuthItem::TYPE_ROLE:
+            case Item::TYPE_ROLE:
                 $name = Yii::t('AuthModule.main', 'role|roles', $n);
                 break;
 
             default:
-                throw new CException('Auth item type "' . $type . '" is valid.');
+                $name = 'XXX'; // FIXME имена ролей, заданий, операций
+                break;
+                throw new Exception('Auth item type "' . $type . '" is invalid.');
         }
         return $name;
     }
@@ -66,26 +79,26 @@ abstract class AuthController extends CController
      * Returns the controllerId for the given authorization item.
      * @param string $type the item type (0=operation, 1=task, 2=role).
      * @return string the controllerId.
-     * @throws CException if the item type is invalid.
+     * @throws Exception if the item type is invalid.
      */
     public function getItemControllerId($type)
     {
         $controllerId = null;
         switch ($type) {
-            case CAuthItem::TYPE_OPERATION:
+            /*case Item::TYPE_OPERATION:
                 $controllerId = 'operation';
                 break;
 
-            case CAuthItem::TYPE_TASK:
+            case Item::TYPE_TASK:
                 $controllerId = 'task';
-                break;
+                break;*/
 
-            case CAuthItem::TYPE_ROLE:
+            case Item::TYPE_ROLE:
                 $controllerId = 'role';
                 break;
 
             default:
-                throw new CException('Auth item type "' . $type . '" is valid.');
+                throw new Exception('Auth item type "' . $type . '" is invalid.');
         }
         return $controllerId;
     }
@@ -102,7 +115,7 @@ abstract class AuthController extends CController
             return ucfirst($string);
         }
 
-        $encoding = Yii::app()->charset;
+        $encoding = Yii::$app->charset;
         $firstChar = mb_strtoupper(mb_substr($string, 0, 1, $encoding), $encoding);
         return $firstChar . mb_substr($string, 1, mb_strlen($string, $encoding) - 1, $encoding);
     }
@@ -120,20 +133,25 @@ abstract class AuthController extends CController
                 'active' => $this instanceof AssignmentController,
             ),
             array(
-                'label' => $this->capitalize($this->getItemTypeText(CAuthItem::TYPE_ROLE, true)),
+                'label' => $this->capitalize($this->getItemTypeText(Item::TYPE_ROLE, true)),
                 'url' => array('/auth/role/index'),
                 'active' => $this instanceof RoleController,
             ),
             array(
-                'label' => $this->capitalize($this->getItemTypeText(CAuthItem::TYPE_TASK, true)),
+                'label' => $this->capitalize($this->getItemTypeText(Item::TYPE_TASK, true)),
                 'url' => array('/auth/task/index'),
                 'active' => $this instanceof TaskController,
             ),
             array(
-                'label' => $this->capitalize($this->getItemTypeText(CAuthItem::TYPE_OPERATION, true)),
+                'label' => $this->capitalize($this->getItemTypeText(Item::TYPE_OPERATION, true)),
                 'url' => array('/auth/operation/index'),
                 'active' => $this instanceof OperationController,
             ),
         );
+    }
+
+    public function checkAccess()
+    {
+        return true;
     }
 }

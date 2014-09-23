@@ -7,6 +7,16 @@
  * @package auth.controllers
  */
 
+namespace auth\controllers;
+
+use auth\components\AuthController;
+use auth\components\AuthItemDataProvider;
+use auth\models\AuthItemForm;
+use sbuilder\helpers\Dev;
+use Yii;
+use yii\rbac\PhpManager;
+use yii\web\HttpException;
+
 /**
  * Base controller for authorization item related actions.
  */
@@ -25,11 +35,11 @@ abstract class AuthItemController extends AuthController
         $dataProvider = new AuthItemDataProvider();
         $dataProvider->type = $this->type;
 
-        $this->render(
+        return $this->render(
             'index',
-            array(
+            [
                 'dataProvider' => $dataProvider,
-            )
+            ]
         );
     }
 
@@ -43,44 +53,44 @@ abstract class AuthItemController extends AuthController
         if (isset($_POST['AuthItemForm'])) {
             $model->attributes = $_POST['AuthItemForm'];
             if ($model->validate()) {
-                /* @var $am CAuthManager|AuthBehavior */
-                $am = Yii::app()->getAuthManager();
+                /* @var $am \yii\rbac\BaseManager|AuthBehavior */
+                $am = Yii::$app->getAuthManager();
 
                 if (($item = $am->getAuthItem($model->name)) === null) {
                     $item = $am->createAuthItem($model->name, $model->type, $model->description);
-                    if ($am instanceof CPhpAuthManager) {
+                    if ($am instanceof PhpManager) {
                         $am->save();
                     }
                 }
 
-                $this->redirect(array('view', 'name' => $item->name));
+                $this->redirect(['view', 'name' => $item->name]);
             }
         }
 
         $model->type = $this->type;
 
-        $this->render(
+        return $this->render(
             'create',
-            array(
+            [
                 'model' => $model,
-            )
+            ]
         );
     }
 
     /**
      * Displays a form for updating the item with the given name.
      * @param string $name name of the item.
-     * @throws CHttpException if the authorization item is not found.
+     * @throws HttpException if the authorization item is not found.
      */
     public function actionUpdate($name)
     {
-        /* @var $am CAuthManager|AuthBehavior */
-        $am = Yii::app()->getAuthManager();
+        /* @var $am \yii\rbac\BaseManager|AuthBehavior */
+        $am = Yii::$app->getAuthManager();
 
         $item = $am->getAuthItem($name);
 
         if ($item === null) {
-            throw new CHttpException(404, Yii::t('AuthModule.main', 'Page not found.'));
+            throw new HttpException(404, Yii::t('AuthModule.main', 'Page not found.'));
         }
 
         $model = new AuthItemForm('update');
@@ -91,11 +101,11 @@ abstract class AuthItemController extends AuthController
                 $item->description = $model->description;
 
                 $am->saveAuthItem($item);
-                if ($am instanceof CPhpAuthManager) {
+                if ($am instanceof PhpManager) {
                     $am->save();
                 }
 
-                $this->redirect(array('index'));
+                $this->redirect(['index']);
             }
         }
 
@@ -103,12 +113,12 @@ abstract class AuthItemController extends AuthController
         $model->description = $item->description;
         $model->type = $item->type;
 
-        $this->render(
+        return $this->render(
             'update',
-            array(
+            [
                 'item' => $item,
                 'model' => $model,
-            )
+            ]
         );
     }
 
@@ -120,15 +130,15 @@ abstract class AuthItemController extends AuthController
     {
         $formModel = new AddAuthItemForm();
 
-        /* @var $am CAuthManager|AuthBehavior */
-        $am = Yii::app()->getAuthManager();
+        /* @var $am \yii\rbac\BaseManager|AuthBehavior */
+        $am = Yii::$app->getAuthManager();
 
         if (isset($_POST['AddAuthItemForm'])) {
             $formModel->attributes = $_POST['AddAuthItemForm'];
             if ($formModel->validate()) {
                 if (!$am->hasItemChild($name, $formModel->items)) {
                     $am->addItemChild($name, $formModel->items);
-                    if ($am instanceof CPhpAuthManager) {
+                    if ($am instanceof PhpManager) {
                         $am->save();
                     }
                 }
@@ -137,10 +147,10 @@ abstract class AuthItemController extends AuthController
 
         $item = $am->getAuthItem($name);
 
-        $dpConfig = array(
+        $dpConfig = [
             'pagination' => false,
-            'sort' => array('defaultOrder' => 'depth asc'),
-        );
+            'sort' => ['defaultOrder' => 'depth asc'],
+        ];
 
         $ancestors = $am->getAncestors($name);
         $ancestorDp = new PermissionDataProvider(array_values($ancestors), $dpConfig);
@@ -150,48 +160,48 @@ abstract class AuthItemController extends AuthController
 
         $childOptions = $this->getItemChildOptions($item->name);
         if (!empty($childOptions)) {
-            $childOptions = array_merge(array('' => Yii::t('AuthModule.main', 'Select item') . ' ...'), $childOptions);
+            $childOptions = array_merge(['' => Yii::t('AuthModule.main', 'Select item') . ' ...'], $childOptions);
         }
 
-        $this->render(
+        return $this->render(
             'view',
-            array(
+            [
                 'item' => $item,
                 'ancestorDp' => $ancestorDp,
                 'descendantDp' => $descendantDp,
                 'formModel' => $formModel,
                 'childOptions' => $childOptions,
-            )
+            ]
         );
     }
 
     /**
      * Deletes the item with the given name.
-     * @throws CHttpException if the item does not exist or if the request is invalid.
+     * @throws HttpException if the item does not exist or if the request is invalid.
      */
     public function actionDelete()
     {
         if (isset($_GET['name'])) {
             $name = $_GET['name'];
 
-            /* @var $am CAuthManager|AuthBehavior */
-            $am = Yii::app()->getAuthManager();
+            /* @var $am \yii\rbac\BaseManager|AuthBehavior */
+            $am = Yii::$app->getAuthManager();
 
             $item = $am->getAuthItem($name);
             if ($item instanceof CAuthItem) {
                 $am->removeAuthItem($name);
-                if ($am instanceof CPhpAuthManager) {
+                if ($am instanceof PhpManager) {
                     $am->save();
                 }
 
                 if (!isset($_POST['ajax'])) {
-                    $this->redirect(array('index'));
+                    $this->redirect(['index']);
                 }
             } else {
-                throw new CHttpException(404, Yii::t('AuthModule.main', 'Item does not exist.'));
+                throw new HttpException(404, Yii::t('AuthModule.main', 'Item does not exist.'));
             }
         } else {
-            throw new CHttpException(400, Yii::t('AuthModule.main', 'Invalid request.'));
+            throw new HttpException(400, Yii::t('AuthModule.main', 'Invalid request.'));
         }
     }
 
@@ -202,17 +212,17 @@ abstract class AuthItemController extends AuthController
      */
     public function actionRemoveParent($itemName, $parentName)
     {
-        /* @var $am CAuthManager|AuthBehavior */
-        $am = Yii::app()->getAuthManager();
+        /* @var $am \yii\rbac\BaseManager|AuthBehavior */
+        $am = Yii::$app->getAuthManager();
 
         if ($am->hasItemChild($parentName, $itemName)) {
             $am->removeItemChild($parentName, $itemName);
-            if ($am instanceof CPhpAuthManager) {
+            if ($am instanceof PhpManager) {
                 $am->save();
             }
         }
 
-        $this->redirect(array('view', 'name' => $itemName));
+        $this->redirect(['view', 'name' => $itemName]);
     }
 
     /**
@@ -222,17 +232,17 @@ abstract class AuthItemController extends AuthController
      */
     public function actionRemoveChild($itemName, $childName)
     {
-        /* @var $am CAuthManager|AuthBehavior */
-        $am = Yii::app()->getAuthManager();
+        /* @var $am \yii\rbac\BaseManager|AuthBehavior */
+        $am = Yii::$app->getAuthManager();
 
         if ($am->hasItemChild($itemName, $childName)) {
             $am->removeItemChild($itemName, $childName);
-            if ($am instanceof CPhpAuthManager) {
+            if ($am instanceof PhpManager) {
                 $am->save();
             }
         }
 
-        $this->redirect(array('view', 'name' => $itemName));
+        $this->redirect(['view', 'name' => $itemName]);
     }
 
     /**
@@ -242,10 +252,10 @@ abstract class AuthItemController extends AuthController
      */
     protected function getItemChildOptions($itemName)
     {
-        $options = array();
+        $options = [];
 
-        /* @var $am CAuthManager|AuthBehavior */
-        $am = Yii::app()->getAuthManager();
+        /* @var $am \yii\rbac\BaseManager|AuthBehavior */
+        $am = Yii::$app->getAuthManager();
 
         $item = $am->getAuthItem($itemName);
         if ($item instanceof CAuthItem) {
@@ -273,7 +283,7 @@ abstract class AuthItemController extends AuthController
      */
     protected function getValidChildTypes()
     {
-        $validTypes = array();
+        $validTypes = [];
 
         switch ($this->type) {
             case CAuthItem::TYPE_OPERATION:
