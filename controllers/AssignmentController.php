@@ -7,19 +7,14 @@
  * @package auth.controllers
  */
 
-namespace auth\controllers;
+namespace sb\modules\auth\controllers;
 
-use auth\components\AuthBehavior;
-use auth\components\AuthController;
-use auth\components\AuthItemDataProvider;
-use auth\models\AddAuthItemForm;
-use sbuilder\helpers\Dev;
+use sb\modules\auth\components\AuthController;
+use sb\modules\auth\models\ChildForm;
 use yii\data\ActiveDataProvider;
 use Yii;
 use yii\db\ActiveRecord;
-use yii\rbac\BaseManager;
-use yii\rbac\Item;
-use yii\rbac\PhpManager;
+use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 
 /**
@@ -33,123 +28,98 @@ class AssignmentController extends AuthController
     public function actionIndex()
     {
         $model = $this->module->userClass;
-        $dataProvider = new ActiveDataProvider(['query' => $model::find()]);
 
-        return $this->render(
-            'index',
-            [
-                'dataProvider' => $dataProvider
-            ]
-        );
+        return $this->render('index', [
+            'dataProvider' => new ActiveDataProvider([
+                'query' => $model::find()
+            ]),
+        ]);
     }
 
     /**
      * Displays the assignments for the user with the given id.
+     *
      * @param string $id the user id.
+     *
+     * @return string
      */
     public function actionView($id)
     {
-        $formModel = new AddAuthItemForm();
+        $model = new ChildForm;
 
-        /* @var $am \yii\rbac\BaseManager|AuthBehavior */
-        $am = Yii::$app->getAuthManager();
-
-        if (isset($_POST['AddAuthItemForm'])) {
-            $formModel->attributes = $_POST['AddAuthItemForm'];
-            if ($formModel->validate()) {
-                if (!$am->isAssigned($formModel->items, $id)) {
-                    $am->assign($formModel->items, $id);
-                    if ($am instanceof PhpManager) {
-                        $am->save();
-                    }
-
-                    if ($am instanceof PhpManager) {
-                        $am->flushAccess($formModel->items, $id);
-                    }
+        // set assignment
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            foreach ($model->items as $name) {
+                if ($role = Yii::$app->authManager->getRole($name)) {
+                    Yii::$app->authManager->assign($role, $id);
                 }
             }
         }
 
         /** @var ActiveRecord $model */
-        $model = $this->module->userClass;
-        $model = $model::findOne(['id' => $id]); // FIXME искать по первичному ключу
+        $modelUser = $this->module->userClass;
+        $user = $modelUser::findOne($id);
 
-        $assignments = $am->getAssignments($id);
-        $authItems = $am->getItemsPermissions(array_keys($assignments));
-        $authItemDp = new AuthItemDataProvider();
-        $authItemDp->setAuthItems($authItems);
+        // assigned items
+        $roles = Yii::$app->authManager->getRolesByUser($id);
+        usort($roles, function ($a, $b) {
+            return $a->description - $b->description;
+        });
+        $permissions = Yii::$app->authManager->getPermissionsByUser($id);
+        usort($permissions, function ($a, $b) {
+            return $a->description - $b->description;
+        });
+        $assignments = ArrayHelper::merge($roles, $permissions);
 
         $assignmentOptions = $this->getAssignmentOptions($id);
-        if (!empty($assignmentOptions)) {
-            $assignmentOptions = array_merge(
-                ['' => Yii::t('AuthModule.main', 'Select item') . ' ...'],
-                $assignmentOptions
-            );
-        }
 
-        return $this->render(
-            'view',
-            [
-                'model' => $model,
-                'authItemDp' => $authItemDp,
-                'formModel' => $formModel,
-                'assignmentOptions' => $assignmentOptions,
-            ]
-        );
+        return $this->render('view', [
+            'user' => $user,
+            'model' => $model,
+            'assignments' => $assignments,
+            'assignmentOptions' => $assignmentOptions,
+        ]);
     }
 
     /**
      * Revokes an assignment from the given user.
-     * @throws HttpException if the request is invalid.
+     *
+     * @param string $name Name of permission.
+     * @param integer $user User id.
+     *
+     * @throws HttpException
      */
-    public function actionRevoke()
+    public function actionRevoke($name, $user)
     {
-        if (isset($_GET['itemName'], $_GET['userId'])) {
-            $itemName = $_GET['itemName'];
-            $userId = $_GET['userId'];
-
-            /* @var $am BaseManager|AuthBehavior */
-            $am = Yii::$app->getAuthManager();
-
-            if ($am->isAssigned($itemName, $userId)) {
-                $am->revoke($itemName, $userId);
-                if ($am instanceof PhpManager) {
-                    $am->save();
-                }
-
-                if ($am instanceof PhpManager) {
-                    $am->flushAccess($itemName, $userId);
-                }
-            }
-
-            if (!isset($_POST['ajax'])) {
-                $this->redirect(['view', 'id' => $userId]);
+        if (Yii::$app->authManager->getAssignment($name, $user)) {
+            if ($item = Yii::$app->authManager->getRole($name)) {
+                Yii::$app->authManager->revoke($item, $user);
+                $this->redirect(['view', 'id' => $user]);
+            } else {
+                throw new HttpException(404, Yii::t('auth.main', 'Role does not exist.'));
             }
         } else {
-            throw new HttpException(400, Yii::t('AuthModule.main', 'Invalid request.'));
+            throw new HttpException(404, Yii::t('auth.main', 'Assignment does not exist.'));
         }
     }
 
     /**
      * Returns a list of possible assignments for the user with the given id.
-     * @param string $userId the user id.
-     * @return array the assignment options.
+     *
+     * @param integer $userId User id.
+     *
+     * @return array Assignment options list.
      */
     protected function getAssignmentOptions($userId)
     {
         $options = [];
 
-        /* @var $am BaseManager|AuthBehavior */
-        $am = Yii::$app->authManager;
+        $assignments = Yii::$app->authManager->getRolesByUser($userId);
+        $roles = Yii::$app->authManager->getRoles();
 
-        $assignments = $am->getAssignments($userId);
-        $assignedItems = array_keys($assignments);
-
-        /* @var $authItems Item[] */
-        $authItems = $am->getItems();
-        foreach ($authItems as $itemName => $item) {
-            if (!in_array($itemName, $assignedItems)) {
-                $options[$this->capitalize($this->getItemTypeText($item->type, true))][$itemName] = $item->description;
+        foreach ($roles as $name => $role) {
+            if (!isset($assignments[$name])) {
+                $options[$name] = $role->description;
             }
         }
 

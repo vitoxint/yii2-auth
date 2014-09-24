@@ -1,81 +1,99 @@
 <?php
-/* @var $this AssignmentController */
+use yii\bootstrap\ActiveForm;
+use yii\bootstrap\Button;
+use yii\data\ArrayDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
+use yii\rbac\Item;
 
-/* @var $model User */
-/* @var $authItemDp AuthItemDataProvider */
-/* @var $formModel AddAuthItemForm */
-/* @var $form TbActiveForm */
-/* @var $assignmentOptions array */
-
-/*$this->breadcrumbs = array(
-    Yii::t('AuthModule.main', 'Assignments') => array('index'),
-    CHtml::value($model, $this->module->userNameColumn),
-);*/
+/**
+ * @var \yii\db\ActiveRecord $user
+ * @var sb\modules\auth\models\ChildForm $model
+ * @var yii\rbac\Role[] $assignments
+ * @var array $assignmentOptions
+ */
 ?>
 
-<h1><?php echo Html::encode($model->{$this->context->module->userNameColumn}); ?>
-    <small><?php echo Yii::t('AuthModule.main', 'Assignments'); ?></small>
-</h1>
+<div class="row">
+    <div class="col-md-12">
+        <h1><?= Yii::t('auth.main', 'Assignments') . ': ' . Html::encode($user->{$this->context->module->userNameColumn}) ?></h1>
+    </div>
+</div>
 
 <div class="row">
+    <div class="col-md-12">
+        <?= $this->render('../menu/default') ?>
+    </div>
+</div>
 
-    <div class="span6">
+<div class="row">
+    <div class="col-md-12">
 
-        <h3>
-            <?php echo Yii::t('AuthModule.main', 'Permissions'); ?>
-            <small><?php echo Yii::t('AuthModule.main', 'Items assigned to this user'); ?></small>
-        </h3>
-
-        <?= GridView::widget(
-            [
-                //'type' => 'striped condensed hover',
-                'dataProvider' => $authItemDp,
-                'emptyText' => Yii::t('AuthModule.main', 'This user does not have any assignments.'),
-                //'hideHeader' => true,
-                'layout' => "{items}",
-                'columns' => [
-                    [
-                        'class' => 'auth\widgets\AuthItemDescriptionColumn',
-                        'active' => true,
-                    ],
-                    [
-                        'class' => 'auth\widgets\AuthItemTypeColumn',
-                        'active' => true,
-                    ],
-                    [
-                        'class' => 'auth\widgets\AuthAssignmentRevokeColumn',
-                        'userId' => $model->{$this->context->module->userIdColumn},
-                    ],
+        <?= GridView::widget([
+            'dataProvider' => new ArrayDataProvider(['allModels' => $assignments]),
+            'tableOptions' => ['class' => 'table table-hover'],
+            'layout' => '{items}',
+            'columns' => [
+                [
+                    'label' => Yii::t('auth.main', 'Description'),
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return Html::a($data->description, ['role/view', 'name' => $data->name, 'type' => $data->type]);
+                    }
                 ],
-            ]
-        ); ?>
-
-        <?php if (!empty($assignmentOptions)): ?>
-
-            <h4><?php echo Yii::t('AuthModule.main', 'Assign permission'); ?></h4>
-
-            <?php $form = $this->beginWidget(
-                'bootstrap.widgets.TbActiveForm',
                 [
-                    'layout' => TbHtml::FORM_LAYOUT_INLINE,
-                ]
-            ); ?>
-
-            <?php echo $form->dropDownList($formModel, 'items', $assignmentOptions, ['label' => false]); ?>
-
-            <?php echo TbHtml::submitButton(
-                Yii::t('AuthModule.main', 'Assign'),
+                    'label' => Yii::t('auth.main', 'Type'),
+                    'format' => 'raw',
+                    'contentOptions' => ['class' => 'col-md-2'],
+                    'value' => function ($data) {
+                        return $data->type == Item::TYPE_ROLE
+                            ? '<span class="label label-primary">' . Yii::t('auth.main', 'Role') . '</span>'
+                            : '<span class="label label-default">' . Yii::t('auth.main', 'Permission') . '</span>';
+                    }
+                ],
                 [
-                    'color' => TbHtml::BUTTON_COLOR_PRIMARY,
-                ]
-            ); ?>
-
-            <?php $this->endWidget(); ?>
-
-        <?php endif; ?>
+                    'format' => 'raw',
+                    'contentOptions' => ['class' => 'col-md-1 text-right'],
+                    'value' => function ($data) use ($user) {
+                        if (Yii::$app->authManager->getAssignment($data->name, $user->{$user::primaryKey()[0]})) {
+                            return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['revoke', 'user' => $user->{$user::primaryKey()[0]}, 'name' => $data->name], [
+                                'class' => 'btn btn-link btn-xs',
+                                'title' => Yii::t('auth.main', 'Revoke'),
+                            ]);
+                        } else {
+                            return false;
+                        }
+                    }
+                ],
+            ],
+        ]) ?>
 
     </div>
-
 </div>
+
+<?php if (!empty($assignmentOptions)) { ?>
+
+    <hr/>
+
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+
+            <h3><?= Yii::t('auth.main', 'Assign permission') ?></h3>
+
+            <?php $form = ActiveForm::begin() ?>
+
+            <?= $form->field($model, 'items[]', ['enableLabel' => false])->dropDownList($assignmentOptions, [
+                'multiple' => 'multiple',
+                'size' => 10,
+            ]) ?>
+
+            <div class="form-group text-center">
+                <?= Button::widget(['label' => Yii::t('auth.main', 'Assign'), 'options' => ['class' => 'btn-success']]) ?>
+            </div>
+
+            <?php ActiveForm::end() ?>
+
+        </div>
+    </div>
+
+<?php } // if ?>

@@ -15,10 +15,10 @@ use yii\rbac\Item;
 /**
  * Controller for role related actions.
  */
-class RoleController extends ItemController
+class PermissionController extends ItemController
 {
     /**
      * @var integer Item type.
      */
-    public $type = Item::TYPE_ROLE;
+    public $type = Item::TYPE_PERMISSION;
 }

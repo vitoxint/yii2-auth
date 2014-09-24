@@ -7,7 +7,7 @@
  * @package auth.components
  */
 
-namespace auth\components;
+namespace sb\modules\auth\components;
 
 /**
  * Caching layer for CDbAuthManager that allows for caching access checks.

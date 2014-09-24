@@ -7,12 +7,12 @@
  * @package auth.components
  */
 
-namespace auth\components;
+namespace sb\modules\auth\components;
 
-use auth\controllers\AssignmentController;
-use auth\controllers\OperationController;
-use auth\controllers\RoleController;
-use auth\controllers\TaskController;
+use sb\modules\auth\controllers\AssignmentController;
+use sb\modules\auth\controllers\OperationController;
+use sb\modules\auth\controllers\RoleController;
+use sb\modules\auth\controllers\TaskController;
 use yii\base\Exception;
 use yii\rbac\Item;
 use yii\web\Controller;
@@ -24,57 +24,6 @@ use Yii;
  */
 abstract class AuthController extends Controller
 {
-    /**
-     * @var array context menu items. This property will be assigned to {@link CMenu::items}.
-     */
-    public $menu = array();
-    /**
-     * @var array the breadcrumbs of the current page.
-     */
-    public $breadcrumbs = array();
-
-    /**
-     * Initializes the controller.
-     */
-    public function init()
-    {
-        parent::init();
-        $this->layout = $this->module->defaultLayout;
-        //$this->menu = $this->getSubMenu();
-    }
-
-    /**
-     * Returns the authorization item type as a string.
-     * @param string $type the item type (0=operation, 1=task, 2=role).
-     * @param boolean $plural whether to return the name in plural.
-     * @return string the text.
-     * @throws Exception if the item type is invalid.
-     */
-    public function getItemTypeText($type, $plural = false)
-    {
-        // todo: change the default value for $plural to false.
-        $n = $plural ? 2 : 1;
-        switch ($type) {
-            /*case Item::TYPE_OPERATION:
-                $name = Yii::t('AuthModule.main', 'operation|operations', $n);
-                break;
-
-            case Item::TYPE_TASK:
-                $name = Yii::t('AuthModule.main', 'task|tasks', $n);
-                break;*/
-
-            case Item::TYPE_ROLE:
-                $name = Yii::t('AuthModule.main', 'role|roles', $n);
-                break;
-
-            default:
-                $name = 'XXX'; // FIXME имена ролей, заданий, операций
-                break;
-                throw new Exception('Auth item type "' . $type . '" is invalid.');
-        }
-        return $name;
-    }
-
     /**
      * Returns the controllerId for the given authorization item.
      * @param string $type the item type (0=operation, 1=task, 2=role).
@@ -118,40 +67,5 @@ abstract class AuthController extends Controller
         $encoding = Yii::$app->charset;
         $firstChar = mb_strtoupper(mb_substr($string, 0, 1, $encoding), $encoding);
         return $firstChar . mb_substr($string, 1, mb_strlen($string, $encoding) - 1, $encoding);
-    }
-
-    /**
-     * Returns the sub menu configuration.
-     * @return array the configuration.
-     */
-    protected function getSubMenu()
-    {
-        return array(
-            array(
-                'label' => Yii::t('AuthModule.main', 'Assignments'),
-                'url' => array('/auth/assignment/index'),
-                'active' => $this instanceof AssignmentController,
-            ),
-            array(
-                'label' => $this->capitalize($this->getItemTypeText(Item::TYPE_ROLE, true)),
-                'url' => array('/auth/role/index'),
-                'active' => $this instanceof RoleController,
-            ),
-            array(
-                'label' => $this->capitalize($this->getItemTypeText(Item::TYPE_TASK, true)),
-                'url' => array('/auth/task/index'),
-                'active' => $this instanceof TaskController,
-            ),
-            array(
-                'label' => $this->capitalize($this->getItemTypeText(Item::TYPE_OPERATION, true)),
-                'url' => array('/auth/operation/index'),
-                'active' => $this instanceof OperationController,
-            ),
-        );
-    }
-
-    public function checkAccess()
-    {
-        return true;
     }
 }

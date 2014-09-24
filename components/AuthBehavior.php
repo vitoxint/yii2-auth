@@ -7,16 +7,15 @@
  * @package auth.components
  */
 
-namespace auth\components;
+namespace sb\modules\auth\components;
 
-use sbuilder\helpers\Dev;
 use yii\base\Behavior;
 use yii\rbac\Item;
 
 /**
  * Auth module behavior for the authorization manager.
  *
- * @property \yii\rbac\BaseManager|IAuthManager $owner The authorization manager.
+ * @property \yii\rbac\DbManager $owner The authorization manager.
  */
 class AuthBehavior extends Behavior
 {
@@ -227,56 +226,40 @@ class AuthBehavior extends Behavior
 
     /**
      * Returns the permission tree for the given items.
-     * @param Item[] $items items to process. If omitted the complete tree will be returned.
-     * @param integer $depth current depth.
-     * @return array the permissions.
+     *
+     * @param Item[] $items Items to process. If omitted the complete tree will be returned.
+     *
+     * @return array Permissions.
      */
-    private function getPermissions($items = null, $depth = 0)
+    private function getPermissions($items = null)
     {
-        $permissions = [];
-
         if ($items === null) {
-            $items = $this->owner->getPermissions();
-        }
-
-        foreach ($items as $itemName => $item) {
-            $permissions[$itemName] = [
-                'name' => $itemName,
-                'item' => $item,
-                //'children' => $this->getChildren($item),//getPermissions($item, $depth + 1),
-                'depth' => $depth,
+            $items = [
+                Item::TYPE_ROLE => $this->owner->getRoles(),
+                Item::TYPE_PERMISSION => $this->owner->getPermissions(),
             ];
         }
 
-        return $permissions;
-    }
-
-    /**
-     * Builds the permissions for the given item.
-     * @param string $itemName name of the item.
-     * @return array the permissions.
-     */
-    private function getItemPermissions($itemName)
-    {
-        $item = $this->owner->getAuthItem($itemName);
-        return $item instanceof CAuthItem ? $this->getPermissions($item->getChildren()) : [];
+        return $items;
     }
 
     /**
      * Returns the permissions for the items with the given names.
-     * @param string[] $names list of item names.
-     * @return array the permissions.
+     *
+     * @param string[] $names List of item names.
+     *
+     * @return array Permissions.
      */
     public function getItemsPermissions($names)
     {
         $permissions = [];
 
         $items = $this->getPermissions();
-        $flat = $this->flattenPermissions($items);
 
-        foreach ($flat as $itemName => $item) {
-            if (in_array($itemName, $names)) {
-                $permissions[$itemName] = $item;
+
+        foreach ($items as $name => $item) {
+            if (in_array($name, $names)) {
+                $permissions[$name] = $item;
             }
         }
 
@@ -285,8 +268,10 @@ class AuthBehavior extends Behavior
 
     /**
      * Flattens the given permission tree.
-     * @param array $permissions the permissions tree.
-     * @return array the permissions.
+     *
+     * @param array $permissions Permissions tree.
+     *
+     * @return array Permissions.
      */
     public function flattenPermissions($permissions)
     {

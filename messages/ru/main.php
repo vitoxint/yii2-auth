@@ -28,7 +28,7 @@ return array (
 	'Assign' => 'Назначить',
 	'Assign permission' => 'Назначить права',
 	'Assigned items' => 'Назначенные элементы',
-	'Assignments' => 'Соответствия',
+	'Assignments' => 'Назначения',
 	'Business rule' => 'Бизнес правило',
 	'Cancel' => 'Отменить',
 	'Create' => 'Создать',
@@ -63,4 +63,13 @@ return array (
 	'operation|operations' => 'операция|операции',
 	'role|roles' => 'роль|роли',
 	'task|tasks' => 'задание|задания',
+
+    'Select an item' => 'Выберите элемент',
+    'Role' => 'Роль',
+    'Roles' => 'Роли',
+    'role' => 'роль',
+    'roles' => 'роли',
+    'Permission' => 'Права',
+    'permission' => 'права',
+    'permissions' => 'права',
 );

@@ -7,7 +7,7 @@
  * @package auth.components
  */
 
-namespace auth\components;
+namespace sb\modules\auth\components;
 
 /**
  * Interface for cached authorization managers.
