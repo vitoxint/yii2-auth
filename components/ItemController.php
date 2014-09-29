@@ -46,7 +46,10 @@ abstract class ItemController extends AuthController
      */
     public function actionIndex()
     {
+        $model = $this->create('index');
+
         return $this->render('index', [
+            'model' => $model,
             'dataProvider' => new ItemDataProvider($this->type),
         ]);
     }
@@ -57,6 +60,22 @@ abstract class ItemController extends AuthController
      * @return string
      */
     public function actionCreate()
+    {
+        $model = $this->create('view');
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     *
+     *
+     * @param $redirect
+     *
+     * @return ItemForm
+     */
+    private function create($redirect)
     {
         $model = new ItemForm;
         $model->scenario = 'create';
@@ -70,12 +89,17 @@ abstract class ItemController extends AuthController
                 Yii::$app->authManager->add($item);
             }
 
-            $this->redirect(['view', 'name' => $item->name, 'type' => $item->type]);
+            switch ($redirect) {
+                case 'view':
+                    $this->redirect(['view', 'name' => $item->name, 'type' => $item->type]);
+                    break;
+                case 'index':
+                    $this->redirect(['index']);
+                    break;
+            }
         }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        return $model;
     }
 
     /**

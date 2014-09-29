@@ -1,4 +1,6 @@
 <?php
+use yii\bootstrap\ActiveForm;
+use yii\bootstrap\Button;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\rbac\Item;
@@ -69,88 +71,46 @@ use yii\rbac\Item;
     </div>
 </div>
 
-<?php /* if (Yii::$app->getController()->id == 'operation') { ?>
+<?php if (!empty($this->context->actionsMap)) { ?>
 
+    <hr/>
 
-    <p class="alert alert-info">Если действия из списка ниже не будут добавлено в качестве операции, то они будут доступны только пользователю Admin.</p>
-
-    <table class="table table-hover">
-        <?php
-        $classes = array_unique($this->module->authControllers);
-        foreach($classes as $class) { ?>
-
+    <?php foreach ($this->context->actionsMap as $controller => $actions) { ?>
+        <table class="table table-hover">
+            <thead>
             <tr>
-                <th colspan="3">Операция на основе действий <b><?= $class ?></b></th>
+                <th colspan="2">Права на основе действий контроллера <code><?= $controller ?></code></th>
             </tr>
             <tr>
-                <td><b>Идентификатор действия</b></td>
-                <td><b>Название (label)</b></td>
-
+                <th class="col-md-5">Системное название</th>
+                <th class="col-md-7">Описание</th>
             </tr>
-
-            <?php
-            $obj = new $class(strtolower(str_replace('Controller', '', $class)));
-            $data = $obj->actions();
-
-            foreach ($data as $key => $value) {
-                $operation_name = $obj->getRuleName($key);
-                $label = isset($value['params']['label']) ? $value['params']['label'] : '';
-                ?>
+            </thead>
+            <tbody>
+            <?php foreach ($actions as $name) { ?>
                 <tr>
-                    <td><?= $operation_name ?></td>
-                    <!--td><?= $label ?></td-->
+                    <td><?= $name ?></td>
                     <td>
-                        <?php
-                        if(!array_key_exists($operation_name, Yii::$app->authManager->operations)) {
-                            $form=$this->beginWidget('CActiveForm', array(
-                                'enableAjaxValidation'=>false,
-                                'htmlOptions'=>array(
-                                    'class'=>'form-inline',
-                                    'style'=>'margin: 0;'
-                                ),
-                                'action' => '/auth/operation/create/',
-                            )); ?>
-                            <?php echo $form->hiddenField($model, 'type'); ?>
+                        <?php if ($permission = Yii::$app->authManager->getPermission($name)) { ?>
 
-                            <?php
-                            echo $form->hiddenField(
-                                $model,
-                                'name',
-                                array(
-                                    'readonly' => true,
-                                    'value' => $operation_name,
-                                )
-                            );
-                            ?>
+                            <?= $permission->description ?>
 
-                            <?php
-                            echo $form->textField(
-                                $model,
-                                'description',
-                                array(
-                                    'value' => $label,
-                                )
-                            );
-                            ?>
+                        <?php } else { ?>
 
-                            <?php echo Html::submitButton('+', array('class' => 'btn btn-success')); ?>
+                            <?php $form = ActiveForm::begin(['layout' => 'inline']) ?>
 
-                            </div>
+                            <?= $form->field($model, 'name', ['enableLabel' => false])->hiddenInput(['value' => $name]) ?>
+                            <?= $form->field($model, 'description', ['enableLabel' => false, 'options' => ['class' => 'form-group']])->input('text', ['class' => 'form-control col-md-8 input-sm',]) ?>
+                            <?= Button::widget(['label' => Yii::t('auth.main', 'Create'), 'options' => ['class' => 'btn-primary btn-sm']]) ?>
 
-                            <?php
-                            $this->endWidget();
-                        } else {
-                            $name = Yii::$app->authManager->operations[$operation_name]->description;
-                            echo "<span class='b-has-icon-checked'> {$name}</span>";
-                        }
-                        ?>
+                            <?php ActiveForm::end() ?>
+
+                        <?php } // if ?>
                     </td>
                 </tr>
+            <?php } // if ?>
+            </tbody>
+        </table>
+    <?php } // if ?>
 
-            <?php } ?>
-
-        <?php } ?>
-    </table>
-
-<?php } */
-?>
+<?php } // ?>

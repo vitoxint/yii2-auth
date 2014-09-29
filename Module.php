@@ -48,6 +48,18 @@ class Module extends \yii\base\Module
     public $defaultController = 'assignment';
 
     /**
+     * @var array Map of application's controllers. For example,
+     *
+     * ```php
+     * 'applicationControllers' => [
+     *      '\frontend\controllers' => Yii::getAlias('@frontend') . '/controllers',
+     *      '\backend\controllers' => Yii::getAlias('@backend') . '/controllers',
+     * ],
+     * ```
+     */
+    public $applicationControllers = [];
+
+    /**
      * @var string Path to view files for this module. Specify this to use your own views instead of those shipped with the module.
      */
     public $viewDir;
