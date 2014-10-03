@@ -7,7 +7,7 @@
  * @package auth.components
  */
 
-namespace sb\modules\auth\components;
+namespace auth\components;
 
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
@@ -17,7 +17,7 @@ use Yii;
 /**
  * Data provider for listing authorization items.
  *
- * @package sb\modules\auth\components
+ * @package auth\components
  */
 class ItemDataProvider extends ActiveDataProvider
 {

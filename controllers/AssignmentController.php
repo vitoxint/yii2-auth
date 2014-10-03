@@ -7,10 +7,10 @@
  * @package auth.controllers
  */
 
-namespace sb\modules\auth\controllers;
+namespace auth\controllers;
 
-use sb\modules\auth\components\AuthController;
-use sb\modules\auth\models\ChildForm;
+use auth\components\AuthController;
+use auth\models\ChildForm;
 use yii\data\ActiveDataProvider;
 use Yii;
 use yii\db\ActiveRecord;

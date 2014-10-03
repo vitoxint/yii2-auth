@@ -7,7 +7,7 @@ use yii\rbac\Item;
 
 /**
  * @var \yii\web\View $this
- * @var \sb\modules\auth\components\ItemDataProvider $dataProvider
+ * @var \auth\components\ItemDataProvider $dataProvider
  */
 ?>
 <div class="row">

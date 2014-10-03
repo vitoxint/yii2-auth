@@ -8,7 +8,7 @@ use yii\rbac\Item;
 
 /**
  * @var \yii\db\ActiveRecord $user
- * @var sb\modules\auth\models\ChildForm $model
+ * @var auth\models\ChildForm $model
  * @var yii\rbac\Role[] $assignments
  * @var array $assignmentOptions
  */

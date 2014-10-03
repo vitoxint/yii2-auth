@@ -7,10 +7,10 @@
  * @package auth.controllers
  */
 
-namespace sb\modules\auth\controllers;
+namespace auth\controllers;
 
 use ReflectionClass;
-use sb\modules\auth\components\ItemController;
+use auth\components\ItemController;
 use Yii;
 use yii\rbac\Item;
 

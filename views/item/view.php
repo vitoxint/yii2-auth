@@ -10,7 +10,7 @@ use yii\widgets\DetailView;
 /**
  * @var \yii\web\View $this
  * @var \yii\rbac\Role|\yii\rbac\Permission $item
- * @var sb\modules\auth\models\ChildForm $model
+ * @var \auth\models\ChildForm $model
  * @var \yii\rbac\Role[]|\yii\rbac\Permission[] $children
  */
 ?>

@@ -7,10 +7,10 @@
  * @package auth.controllers
  */
 
-namespace sb\modules\auth\components;
+namespace auth\components;
 
-use sb\modules\auth\models\ChildForm;
-use sb\modules\auth\models\ItemForm;
+use auth\models\ChildForm;
+use auth\models\ItemForm;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\rbac\Item;
@@ -22,7 +22,7 @@ use yii\web\HttpException;
 /**
  * Base controller for authorization item related actions.
  *
- * @package sb\modules\auth\controllers
+ * @package auth\controllers
  */
 abstract class ItemController extends AuthController
 {

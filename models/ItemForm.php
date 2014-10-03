@@ -7,7 +7,7 @@
  * @package auth.models
  */
 
-namespace sb\modules\auth\models;
+namespace auth\models;
 
 use Yii;
 use yii\base\Model;

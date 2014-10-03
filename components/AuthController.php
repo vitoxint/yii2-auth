@@ -7,12 +7,12 @@
  * @package auth.components
  */
 
-namespace sb\modules\auth\components;
+namespace auth\components;
 
-use sb\modules\auth\controllers\AssignmentController;
-use sb\modules\auth\controllers\OperationController;
-use sb\modules\auth\controllers\RoleController;
-use sb\modules\auth\controllers\TaskController;
+use auth\controllers\AssignmentController;
+use auth\controllers\OperationController;
+use auth\controllers\RoleController;
+use auth\controllers\TaskController;
 use yii\base\Exception;
 use yii\rbac\Item;
 use yii\web\Controller;

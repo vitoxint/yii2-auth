@@ -8,7 +8,7 @@
  * @version 2.0.0
  */
 
-namespace sb\modules\auth;
+namespace auth;
 
 use Yii;
 
@@ -73,7 +73,7 @@ class Module extends \yii\base\Module
 
         $this->registerTranslations();
 
-        Yii::$app->authManager->attachBehavior('auth', 'sb\modules\auth\components\AuthBehavior');
+        Yii::$app->authManager->attachBehavior('auth', 'auth\components\AuthBehavior');
 
         if (empty($this->userClass)) {
             $this->userClass = Yii::$app->user->identityClass;
@@ -103,7 +103,7 @@ class Module extends \yii\base\Module
     {
         Yii::$app->i18n->translations['auth.*'] = [
             'class' => 'yii\i18n\PhpMessageSource',
-            'basePath' => '@vendor/binn/sbuilder/modules/auth/messages',
+            'basePath' => '@vendor/binn/yii2-auth/messages',
             'fileMap' => [
                 'auth.main' => 'main.php'
             ],

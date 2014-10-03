@@ -7,9 +7,9 @@
  * @package auth.controllers
  */
 
-namespace sb\modules\auth\controllers;
+namespace auth\controllers;
 
-use sb\modules\auth\components\ItemController;
+use auth\components\ItemController;
 use yii\rbac\Item;
 
 /**

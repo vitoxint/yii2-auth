@@ -7,7 +7,7 @@
  * @package auth.components
  */
 
-namespace sb\modules\auth\components;
+namespace auth\components;
 
 use yii\base\Behavior;
 use yii\rbac\Item;
