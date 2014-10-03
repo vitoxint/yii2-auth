@@ -56,7 +56,7 @@ use yii\rbac\Item;
                     'contentOptions' => ['class' => 'col-md-1 text-right'],
                     'value' => function ($data) use ($user) {
                         if (Yii::$app->authManager->getAssignment($data->name, $user->{$user::primaryKey()[0]})) {
-                            return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['revoke', 'user' => $user->{$user::primaryKey()[0]}, 'name' => $data->name], [
+                            return Html::a('<span class="glyphicon glyphicon-remove"></span>', ['revoke', 'user' => $user->{$user::primaryKey()[0]}, 'name' => $data->name], [
                                 'class' => 'btn btn-link btn-xs',
                                 'title' => Yii::t('auth.main', 'Revoke'),
                             ]);

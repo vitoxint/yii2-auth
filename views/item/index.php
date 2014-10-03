@@ -72,18 +72,18 @@ use yii\rbac\Item;
 </div>
 
 <?php if (!empty($this->context->actionsMap)) { ?>
-
     <hr/>
-
     <?php foreach ($this->context->actionsMap as $controller => $actions) { ?>
         <table class="table table-hover">
             <thead>
             <tr>
-                <th colspan="2">Права на основе действий контроллера <code><?= $controller ?></code></th>
+                <th colspan="2">
+                    <?= Yii::t('auth.main', 'Rights based on {controller} actions', ['controller' => $controller]) ?>
+                </th>
             </tr>
             <tr>
-                <th class="col-md-5">Системное название</th>
-                <th class="col-md-7">Описание</th>
+                <th class="col-md-5"><?= Yii::t('auth.main', 'System name') ?></th>
+                <th class="col-md-7"><?= Yii::t('auth.main', 'Description') ?></th>
             </tr>
             </thead>
             <tbody>
@@ -92,11 +92,8 @@ use yii\rbac\Item;
                     <td><?= $name ?></td>
                     <td>
                         <?php if ($permission = Yii::$app->authManager->getPermission($name)) { ?>
-
                             <?= $permission->description ?>
-
                         <?php } else { ?>
-
                             <?php $form = ActiveForm::begin(['layout' => 'inline']) ?>
 
                             <?= $form->field($model, 'name', ['enableLabel' => false])->hiddenInput(['value' => $name]) ?>
@@ -104,7 +101,6 @@ use yii\rbac\Item;
                             <?= Button::widget(['label' => Yii::t('auth.main', 'Create'), 'options' => ['class' => 'btn-primary btn-sm']]) ?>
 
                             <?php ActiveForm::end() ?>
-
                         <?php } // if ?>
                     </td>
                 </tr>
@@ -112,5 +108,4 @@ use yii\rbac\Item;
             </tbody>
         </table>
     <?php } // if ?>
-
 <?php } // ?>

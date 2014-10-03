@@ -11,6 +11,7 @@ namespace auth\components;
 
 use auth\models\ChildForm;
 use auth\models\ItemForm;
+use sb\helpers\Dev;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\rbac\Item;
@@ -185,6 +186,7 @@ abstract class ItemController extends AuthController
             'model' => $model,
             'item' => $item,
             'children' => $this->getChildren($name),
+            'parents' => $this->getParents($name),
             'childrenOptions' => $this->getChildrenOptions($item->name),
         ]);
     }
@@ -293,7 +295,10 @@ abstract class ItemController extends AuthController
     {
         $options = [];
 
-        $roles = $this->cleanChildren($name, ArrayHelper::map(Yii::$app->authManager->getRoles(), 'name', 'description'));
+        // Get roles only for roles
+        if ($this->type === Item::TYPE_ROLE) {
+            $roles = $this->cleanChildren($name, ArrayHelper::map(Yii::$app->authManager->getRoles(), 'name', 'description'));
+        }
         $permissions = $this->cleanChildren($name, ArrayHelper::map(Yii::$app->authManager->getPermissions(), 'name', 'description'));
 
         if (!empty($roles)) {
@@ -342,5 +347,27 @@ abstract class ItemController extends AuthController
     protected function typeName($typeId)
     {
         return $typeId == Item::TYPE_ROLE ? 'Role' : 'Permission';
+    }
+
+    /**
+     * @param string $name Auth item 
+     *
+     * @return \yii\rbac\Role[]
+     */
+    protected function getParents($name)
+    {
+        $items = [];
+
+        $roles = Yii::$app->authManager->getRoles();
+        foreach ($roles as $key => $role) {
+            if (ArrayHelper::getValue(Yii::$app->authManager->getPermissionsByRole($key), $name, false)) {
+                $items[] = $role;
+            } elseif (!is_null(Yii::$app->authManager->getRole($name)) && Yii::$app->authManager->hasChild($role, Yii::$app->authManager->getRole($name))) {
+                $items[] = $role;
+            }
+            
+        }
+        
+        return $items;
     }
 }

@@ -72,4 +72,6 @@ return array (
     'Permission' => 'Права',
     'permission' => 'права',
     'permissions' => 'права',
+    
+    'Rights based on {controller} actions' => 'Права на основе действий контроллера {controller}',
 );

@@ -63,4 +63,6 @@ return array (
 	'operation|operations' => 'операція|операції',
 	'role|roles' => 'роль|ролі',
 	'task|tasks' => 'завдання|завдання',
+
+    'Rights based on {controller} actions' => 'Права на основі дій контролера {controller}'
 );
