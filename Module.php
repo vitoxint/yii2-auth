@@ -4,13 +4,12 @@
  * @author Christoffer Niska <ChristofferNiska@gmail.com>
  * @copyright Copyright &copy; Christoffer Niska 2012-
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @package auth
- * @version 2.0.0
  */
 
 namespace auth;
 
 use Yii;
+use yii\web\ForbiddenHttpException;
 
 /**
  * Web module for managing Yii's built-in authorization manager (\yii\rbac\DbeManager).
@@ -55,6 +54,29 @@ class Module extends \yii\base\Module
     public $applicationControllers = [];
 
     /**
+     * @var array Array of user name that don't needs check rights. Be careful with this.
+     */
+    public $admins = [];
+    
+    /**
+     * @var array Access filter configuration for module's actions. For example,
+     *
+     * ```php
+     * 'accessFilterBehavior' => [
+     *     'class' => yii\filters\AccessControl::className(),
+     *     'rules' => [
+     *         [
+     *             'allow' => true,
+     *             'actions' => ['index'],
+     *         ],
+     *     ],
+     * ],
+     *             
+     * If not specified (and user is not admin) all actions will be filters by permission name like `auth.controller_id.action_id`
+     */
+    public $accessFilterBehavior;
+
+    /**
      * @inheritdoc
      */
     public function init()
@@ -62,8 +84,6 @@ class Module extends \yii\base\Module
         parent::init();
 
         $this->registerTranslations();
-
-        Yii::$app->authManager->attachBehavior('auth', 'auth\components\AuthBehavior');
 
         if (empty($this->userClass)) {
             $this->userClass = Yii::$app->user->identityClass;
@@ -99,5 +119,24 @@ class Module extends \yii\base\Module
     public function getVersion()
     {
         return '2.0.0';
+    }
+
+    /**
+     * Check that current user can administrate this module.
+     * 
+     * @param \yii\base\Action $action
+     *
+     * @return bool
+     * @throws \yii\web\ForbiddenHttpException
+     */
+    public function beforeAction($action)
+    {
+        if (!Yii::$app->authManager->isAdmin() && !empty($this->accessFilterBehavior)) {
+            $action->controller->attachBehavior('accessFilter', $this->accessFilterBehavior);
+        } elseif (!Yii::$app->authManager->isAdmin() && !Yii::$app->authManager->checkRoute()) {
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+        }
+
+        return parent::beforeAction($action);
     }
 }

@@ -4,7 +4,6 @@
  * @author Christoffer Niska <ChristofferNiska@gmail.com>
  * @copyright Copyright &copy; Christoffer Niska 2012-
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @package auth.components
  */
 
 namespace auth\components;
@@ -41,6 +40,7 @@ class ItemDataProvider extends ActiveDataProvider
         parent::__construct($config);
 
         $this->type = $type;
+        $this->pagination = false;
     }
 
     /**
@@ -58,7 +58,7 @@ class ItemDataProvider extends ActiveDataProvider
      */
     public function getModels()
     {
-        if (empty($this->query)) {
+        if (empty($this->query) && Yii::$app->authManager instanceof DbManager) {
             $this->query = (new Query)
                 ->from(Yii::$app->authManager->itemTable)
                 ->where(['type' => $this->type]);

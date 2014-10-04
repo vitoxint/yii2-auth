@@ -4,13 +4,13 @@
  * @author Christoffer Niska <ChristofferNiska@gmail.com>
  * @copyright Copyright &copy; Christoffer Niska 2012-
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @package auth.components
  */
 
 namespace auth\components;
 
 use yii\base\Behavior;
 use yii\rbac\Item;
+use Yii;
 
 /**
  * Auth module behavior for the authorization manager.
@@ -292,5 +292,67 @@ class AuthBehavior extends Behavior
             }
         }
         return $flattened;
+    }
+
+    /**
+     * Check that user is admin.
+     * 
+     * @return boolean
+     */
+    public function isAdmin()
+    {
+        if (\Yii::$app->user->isGuest) {
+            return false;
+        }
+        
+        $module = \Yii::$app->getModule('auth');
+        
+        return in_array(\Yii::$app->user->identity->{$module->userNameColumn}, $module->admins);
+    }
+
+    /**
+     * Check access for specified route.
+     *
+     * @param string $route Route to be checked like `module/controller/action`, default to `Yii::$app->controller->getRoute()`
+     * @param array $params Additional params that can be used in business rules.
+     *
+     * @return boolean
+     */
+    public function checkRoute($route = null, array $params = [])
+    {
+        if (is_null($route)) {
+            $route = Yii::$app->controller->getRoute();
+        } elseif (is_array($route)) {
+            $route = $route[0];
+        }
+
+        $route = str_replace('/', '.', $route);
+        if (substr_count($route, '.') > 0) {
+            $controllerRoute = $route;
+        } else {
+            $controllerRoute = $this->getRuleName();
+        }
+
+        return $this->isAdmin() || Yii::$app->user->can($controllerRoute, $params) || Yii::$app->user->can($route, $params);
+    }
+
+    /**
+     * RBAC permission name for specified action.
+     *
+     * @param string $action Action id.
+     *
+     * @return string
+     */
+    public function getRuleName($action = null)
+    {
+        if (is_null($action)) {
+            $ruleName = str_replace('/', '.', \Yii::$app->controller->getRoute());
+        } else {
+            $module = Yii::$app->controller->module;
+
+            $ruleName = $module->id == Yii::$app->id ? Yii::$app->controller->id . '.' . $action : $module->id . '.' . Yii::$app->controller->id . '.' . $action;
+        }
+
+        return $ruleName;
     }
 }

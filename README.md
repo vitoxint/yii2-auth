@@ -7,6 +7,8 @@ You can read more about Yii's authorization manager in the framework documentati
 Auth based on original code of [yii-auth](https://github.com/crisu83/yii-auth) extension and fully rewrited for using with Yii 2.
 Also fork contain all original releases for Yii 1.x.
 
+**At this moment module supports only DbManager.**
+
 ### Demo
 
 Coming soon.
@@ -31,7 +33,7 @@ Add module to application config and configure `authManager` component:
 return [
     'components' => [
         'authManager' => [
-            'class' => 'yii\rbac\DbManager',
+            'class' => 'auth\components\DbManager', // or 'auth\components\PhpManager'
         ],
         // ...
     ],
@@ -55,6 +57,8 @@ Configure the module to suit your needs. Here's a list of the available configur
   'userIdColumn' => 'id', // the name of the user id column.
   'userNameColumn' => 'name', // the name of the user name column.
   'applicationControllers' => [], // the path to controllers files that will be using for generates permissions.
+  'admin' => [], // users with full access to module.
+  'accessFilterBehavior' => [], Configuration for custom access filter.
 ),
 ```
 
@@ -108,11 +112,6 @@ public function behaviors()
 
 For more information on how filters work refer to the framework documentation on [Controllers](http://www.yiiframework.com/doc-2.0/guide-structure-filters.html).
 
-### Internationalization
-
-Do you wish to provide a translation for Auth? If so, please do a pull request for it. 
-Translations should be placed in the messages folder under a folder named according to its locale (e.g. en_us).
-
 ## Versioning
 
 Because Auth contain all versions from original library be careful with versions.
@@ -122,4 +121,4 @@ Version 2.x - for Yii 2.x
 
 ## Contributing
 
-Please, send any issues and PR only for 2.x version. For original 1.x library contribute to [yii-auth](https://github.com/crisu83/yii-auth)
+Please, send any issues and PR only for 2.x version. For original Yii 1.x module contribute to [yii-auth](https://github.com/crisu83/yii-auth)
