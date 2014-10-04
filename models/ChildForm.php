@@ -1,10 +1,10 @@
 <?php
 /**
  * ChildForm class file.
- * @author Christoffer Niska <ChristofferNiska@gmail.com>
- * @copyright Copyright &copy; Christoffer Niska 2012-
+ * @author Artur Fursa <art@binn.ru>
+ * @author Yevhen Servetnyk <evgeniy.servetnik@binn.ru>
+ * @copyright Copyright &copy; Binn Ltd. 2014-
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- * @package auth.models
  */
 
 namespace auth\models;

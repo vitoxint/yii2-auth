@@ -2,7 +2,7 @@
 /**
  * DbManager class file.
  * @author Artur Fursa <art@binn.ru>
- * @copyright Copyright &copy; Artur Fursa 2014-
+ * @copyright Copyright &copy; Binn Ltd 2014-
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  */
 
