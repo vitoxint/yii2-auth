@@ -19,7 +19,6 @@
  * @version $Id: $
  */
 return array (
-	'Access denied.' => 'Afgang nægtet.',
 	'Add' => 'Tilføj',
 	'Add child' => 'Tilføj barn',
 	'Add {type}' => 'Tilføj {type}',

@@ -19,7 +19,6 @@
  * @version $Id: $
  */
 return array (
-	'Access denied.' => '拒绝访问',
 	'Add' => '添加',
 	'Add child' => '添加子项',
 	'Add {type}' => '添加{type}',

@@ -19,7 +19,6 @@
  * @version $Id: $
  */
 return array (
-	'Access denied.' => 'Accesso negato.',
 	'Add' => 'Aggiungi',
 	'Add child' => 'Aggiungi come figlio',
 	'Add {type}' => 'Aggiungi {type}',

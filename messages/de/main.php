@@ -19,7 +19,6 @@
  * @version $Id: $
  */
 return array (
-  'Access denied.' => 'Zugriff verweigert.',
   'Add' => 'Hinzufügen',
   'Add child' => 'Untergeordnetes Element hinzufügen',
   'Add {type}' => '{type} hinzufügen',

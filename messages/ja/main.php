@@ -19,7 +19,6 @@
  * @version $Id: $
  */
 return array (
-	'Access denied.' => 'アクセスが許可されていません。',
 	'Add' => '追加',
 	'Add child' => '子を追加する',
 	'Add {type}' => '{type} を追加する',
