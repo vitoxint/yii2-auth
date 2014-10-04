@@ -1,55 +1,49 @@
-yii-auth
+yii2-auth
 ========
 
 Auth is a module for the [Yii PHP framework](http://www.yiiframework.com) that provides a web user interface for Yii's built-in authorization manager (\yii\rbac\BaseManager).
-You can read more about Yii's authorization manager in the framework documentation under [Authentication and Authorization](http://www.yiiframework.com/doc/guide/1.1/en/topics.auth#role-based-access-control).
+You can read more about Yii's authorization manager in the framework documentation under [Authorization](http://www.yiiframework.com/doc-2.0/guide-security-authorization.html#role-based-access-control-rbac).
 
-Auth was developed to provide a modern and responsive user interface for managing user permissions in Yii projects.
-To achieve its goals it was built using my popular [Twitter Bootstrap extension](http://www.yiiframework.com/extension/bootstrap).
-
-Auth is written according to Yii's conventions and it follows the [separation of concerns](http://en.wikipedia.org/wiki/Separation_of_concerns) priciple and therefore it doesn't require you to extend from its classes.
-Instead it provides additional functionality for the authorization manager through a single behavior.
+Auth based on original code of [yii-auth](https://github.com/crisu83/yii-auth) extension and fully rewrited for using with Yii 2.
+Also fork contain all original releases for Yii 1.x.
 
 ### Demo
 
-You can try out the live demo [here](http://www.cniska.net/yii-auth/).
-
-### Requirements
-
-* [Twitter Bootstrap extension for Yii](http://www.yiiframework.com/extension/bootstrap) version 2.0.0 or above
+Coming soon.
 
 ## Usage
 
 ### Setup
 
-Download the latest release from [Yii extensions](http://www.yiiframework.com/extension/auth).
+The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
 
-Unzip the module under ***protected/modules/auth*** and add the following to your application config:
+Add
+
+```
+"binn/yii2-auth": "*"
+```
+
+to the require section of your `composer.json` file.
+
+Add module to application config and configure `authManager` component:
 
 ```php
-return array(
-  'modules' => array(
-    'auth',
-  ),
-  'components' => array(
-    'authManager' => array(
-      .....
-      'behaviors' => array(
-        'auth' => array(
-          'class' => 'auth.components.AuthBehavior',
-        ),
-      ),
-    ),
-    'user' => array(
-      'class' => 'auth.components.AuthWebUser',
-      'admins' => array('admin', 'foo', 'bar'), // users with full access
-    ),
-  ),
-);
+return [
+    'components' => [
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+        ],
+        // ...
+    ],
+    'modules' => [
+        'auth' => [
+            'class' => 'auth\Module',
+        ],
+    ],
+];
 ```
-***protected/config/main.php***
 
-Please note that while the module doesn't require you to use a database, if you wish to use ***CDbAuthManager*** you need it's schema (it can be found in the framework under web/auth).
+Please note that while the module doesn't require you to use a database, if you wish to use ***yii\rbac\DbManager*** you need it's schema (it can be found in the framework under `yii\rbac\migrations`).
 
 ### Configuration
 
@@ -57,24 +51,10 @@ Configure the module to suit your needs. Here's a list of the available configur
 
 ```php
 'auth' => array(
-  'strictMode' => true, // when enabled authorization items cannot be assigned children of the same type.
-  'userClass' => 'User', // the name of the user model class.
+  'userClass' => Yii::$app->user->identityClass, // the name of the user model class.
   'userIdColumn' => 'id', // the name of the user id column.
   'userNameColumn' => 'name', // the name of the user name column.
-  'defaultLayout' => 'application.views.layouts.main', // the layout used by the module.
-  'viewDir' => null, // the path to view files to use with this module.
-),
-```
-
-#### Enabling caching
-
-To enable caching for ***CDbAuthManager*** you can use ***CachedDbAuthManager*** that provides caching for access checks. 
-Here's an example configuration for the component:
-
-```php
-'authManager'=>array(
-  'class'=>'auth.components.CachedDbAuthManager',
-  'cachingDuration'=>3600,
+  'applicationControllers' => [], // the path to controllers files that will be using for generates permissions.
 ),
 ```
 
@@ -90,30 +70,56 @@ if (Yii::$app->user->can('itemName')) // itemName = name of the operation
 ```
 
 In order to keep your permissions dynamic you should never check for a specific role or task, instead you should always check for an operation. 
-For more information on Yii's authorization manager refer to the framework documentation on [Authentication and Authorization](http://www.yiiframework.com/doc/guide/1.1/en/topics.auth#role-based-access-control).
+For more information on Yii's authorization manager refer to the framework documentation on [Authorization](http://www.yiiframework.com/doc-2.0/guide-security-authorization.html#role-based-access-control-rbac).
 
 #### Checking access using a filter
 
 You can also use a filter to automatically check access before controller actions are called.
 Operations used with this filter has to be named as follows ***(moduleId.)controllerId.actionId***, where ***moduleId*** is optional. 
-You can also use a wildcard ***controllerId.**** instead of the actionId to cover all actions in the controller or ***module.**** instead of the controllerId to cover all controllers in the module. 
+
+For example
 
 ```php
-public function filters()
+public function behaviors()
 {
-  return array(
-    array('auth.filters.AuthFilter'),
-  );
+    return [
+        'access' => [
+            'class' => AccessControl::className(),
+                'rules' => [
+        		    [
+        			    'allow' => true,
+        			    'actions' => ['error', 'login', 'logout'],
+                    ],
+                    [
+                        'allow' => true,
+                        'roles' => [$this->getRuleName($this->action->id)],
+                    ],
+                    [
+                        'allow' => true,
+                        'matchCallback' => function () {
+                            return !Yii::$app->user->isGuest ? !empty(Yii::$app->user->identity->isAdmin) : false;
+                    },
+                ],
+            ],
+        ],
+    ];
 }
 ```
 
-For more information on how filters work refer to the framework documentation on [Controllers](http://www.yiiframework.com/doc/guide/1.1/en/basics.controller#filter).
+For more information on how filters work refer to the framework documentation on [Controllers](http://www.yiiframework.com/doc-2.0/guide-structure-filters.html).
 
 ### Internationalization
 
 Do you wish to provide a translation for Auth? If so, please do a pull request for it. 
 Translations should be placed in the messages folder under a folder named according to its locale (e.g. en_us).
 
-### Note
+## Versioning
 
-Note: Version 1.0.6-wip use and require yiistrap!! yiistrap is next generation yii-bootsrap
+Because Auth contain all versions from original library be careful with versions.
+
+Version 1.x - for Yii 1.x
+Version 2.x - for Yii 2.x
+
+## Contributing
+
+Please, send any issues and PR only for 2.x version. For original 1.x library contribute to [yii-auth](https://github.com/crisu83/yii-auth)
