@@ -18,11 +18,6 @@ use Yii;
 class Module extends \yii\base\Module
 {
     /**
-     * @var boolean Whether to enable the RBAC strict mode. When enabled items cannot be assigned children of the same type.
-     */
-    public $strictMode = true;
-
-    /**
      * @var string Name of the user model class. Change this if your user model name is different than the default value.
      */
     public $userClass;
@@ -35,7 +30,7 @@ class Module extends \yii\base\Module
     /**
      * @var string Name of the user name column. Change this if the name column in your user table is different than the default value.
      */
-    public $userNameColumn = 'username';
+    public $userNameColumn = 'name';
 
     /**
      * @var array Map of flash message keys to use for the module.
@@ -45,7 +40,7 @@ class Module extends \yii\base\Module
     /**
      * @var string String the id of the default controller for this module.
      */
-    public $defaultController = 'assignment';
+    public $defaultRoute = 'assignment';
 
     /**
      * @var array Map of application's controllers. For example,
@@ -58,11 +53,6 @@ class Module extends \yii\base\Module
      * ```
      */
     public $applicationControllers = [];
-
-    /**
-     * @var string Path to view files for this module. Specify this to use your own views instead of those shipped with the module.
-     */
-    public $viewDir;
 
     /**
      * @inheritdoc
@@ -85,15 +75,6 @@ class Module extends \yii\base\Module
             'success' => 'success',
             'warning' => 'warning',
         ]);
-
-        if (isset($this->viewDir)) {
-            if (strpos($this->viewDir, '.')) {
-                $this->viewDir = Yii::getAlias($this->viewDir);
-            }
-
-            $this->setLayoutPath($this->viewDir . DIRECTORY_SEPARATOR . 'layouts');
-            $this->setViewPath($this->viewDir);
-        }
     }
 
     /**
