@@ -12,6 +12,7 @@ namespace auth\controllers;
 use ReflectionClass;
 use auth\components\ItemController;
 use Yii;
+use yii\helpers\Inflector;
 use yii\rbac\Item;
 
 /**
@@ -73,9 +74,9 @@ class PermissionController extends ItemController
 
                         // create map
                         if (!empty($actions)) {
-                            $prefix = mb_strtolower(mb_substr(str_replace(['Controller'], [null], $class), 1, null, Yii::$app->charset), Yii::$app->charset);
+                            $prefix = Inflector::camel2id(str_replace('Controller', '', $reflection->getShortName()), '');
                             foreach ($actions as $action) {
-                                $this->actionsMap[$class][] = $prefix . '::' . mb_strtolower($action, Yii::$app->charset);
+                                $this->actionsMap[$class][] = $prefix . '.' . mb_strtolower($action, Yii::$app->charset);
                             }
                         }
                     }
