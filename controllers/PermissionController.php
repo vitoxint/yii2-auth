@@ -46,7 +46,7 @@ class PermissionController extends ItemController
     }
 
     /**
-     *
+     * Generate actions map
      *
      * @return void
      */
@@ -76,7 +76,9 @@ class PermissionController extends ItemController
                         if (!empty($actions)) {
                             $prefix = Inflector::camel2id(str_replace('Controller', '', $reflection->getShortName()), '');
                             foreach ($actions as $action) {
-                                $this->actionsMap[$class][] = $prefix . '.' . mb_strtolower($action, Yii::$app->charset);
+                                $actionId = $prefix . '.' . mb_strtolower($action, Yii::$app->charset);
+                                $actionId = \Yii::$app->getModule('auth')->useApplicationPrefix ? Yii::$app->id . '.' . $actionId : $actionId;
+                                $this->actionsMap[$class][$actionId] = Inflector::camel2words($actionId);
                             }
                         }
                     }

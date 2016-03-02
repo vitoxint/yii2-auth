@@ -19,7 +19,7 @@ class PhpManager extends \yii\rbac\PhpManager
     public function init()
     {
         parent::init();
-        
-        $this->attachBehavior('auth', ['class' => 'auth\components\AuthBehavior']);
+
+        $this->attachBehavior('auth', ['class' => \Yii::$app->getModule('auth')->authBehavior]);
     }
 }

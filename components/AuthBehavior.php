@@ -327,9 +327,10 @@ class AuthBehavior extends Behavior
             $route = $route[0];
         }
 
-        $route = str_replace('/', '.', $route);
+        $route = str_replace('/', '.', trim($route, '/'));
         if (substr_count($route, '.') > 0) {
             $controllerRoute = $route;
+            $controllerRoute = \Yii::$app->getModule('auth')->useApplicationPrefix ? Yii::$app->id . '.' . $controllerRoute : $controllerRoute;
         } else {
             $controllerRoute = $this->getRuleName();
         }
@@ -352,6 +353,7 @@ class AuthBehavior extends Behavior
             $module = Yii::$app->controller->module;
 
             $ruleName = $module->id == Yii::$app->id ? Yii::$app->controller->id . '.' . $action : $module->id . '.' . Yii::$app->controller->id . '.' . $action;
+            $ruleName = \Yii::$app->getModule('auth')->useApplicationPrefix ? Yii::$app->id . '.' . $ruleName : $ruleName;
         }
 
         return $ruleName;

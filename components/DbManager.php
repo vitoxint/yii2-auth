@@ -20,6 +20,6 @@ class DbManager extends \yii\rbac\DbManager
     {
         parent::init();
         
-        $this->attachBehavior('auth', ['class' => 'auth\components\AuthBehavior']);
+        $this->attachBehavior('auth', ['class' => \Yii::$app->getModule('auth')->authBehavior]);
     }
 }

@@ -87,7 +87,7 @@ use yii\rbac\Item;
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($actions as $name) { ?>
+            <?php foreach ($actions as $name => $description) { ?>
                 <tr>
                     <td><?= $name ?></td>
                     <td>
@@ -97,7 +97,7 @@ use yii\rbac\Item;
                             <?php $form = ActiveForm::begin(['layout' => 'inline']) ?>
 
                             <?= $form->field($model, 'name', ['enableLabel' => false])->hiddenInput(['value' => $name]) ?>
-                            <?= $form->field($model, 'description', ['enableLabel' => false, 'options' => ['class' => 'form-group']])->input('text', ['class' => 'form-control col-md-8 input-sm',]) ?>
+                            <?= $form->field($model, 'description', ['enableLabel' => false, 'options' => ['class' => 'form-group']])->input('text', ['class' => 'form-control col-md-8 input-sm', 'value' => $description]) ?>
                             <?= Button::widget(['label' => Yii::t('auth.main', 'Create'), 'options' => ['class' => 'btn-primary btn-sm']]) ?>
 
                             <?php ActiveForm::end() ?>

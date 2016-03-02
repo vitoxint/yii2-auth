@@ -78,6 +78,16 @@ class Module extends \yii\base\Module
     public $accessFilterBehavior;
 
     /**
+     * @var string Behavior for manager component
+     */
+    public $authBehavior = 'auth\components\AuthBehavior';
+
+    /**
+     * @var boolean Use application prefix for generated permission names
+     */
+    public $useApplicationPrefix = false;
+
+    /**
      * @inheritdoc
      */
     public function init()
