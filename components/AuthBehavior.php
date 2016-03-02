@@ -16,7 +16,7 @@ use Yii;
 /**
  * Auth module behavior for the authorization manager.
  *
- * @property \yii\rbac\DbManager $owner The authorization manager.
+ * @property Yii\rbac\DbManager $owner The authorization manager.
  */
 class AuthBehavior extends Behavior
 {
@@ -302,13 +302,15 @@ class AuthBehavior extends Behavior
      */
     public function isAdmin()
     {
-        if (\Yii::$app->user->isGuest) {
+        if (Yii::$app->user->isGuest) {
             return false;
         }
         
-        $module = \Yii::$app->getModule('auth');
+        $module = Yii::$app->getModule('auth');
+        $userRoles = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->id));
+        $isRbacAdmin = array_intersect($userRoles, $module->admins);
         
-        return in_array(\Yii::$app->user->identity->{$module->userNameColumn}, $module->admins);
+        return $isRbacAdmin;
     }
 
     /**
@@ -330,7 +332,7 @@ class AuthBehavior extends Behavior
         $route = str_replace('/', '.', trim($route, '/'));
         if (substr_count($route, '.') > 0) {
             $controllerRoute = $route;
-            $controllerRoute = \Yii::$app->getModule('auth')->useApplicationPrefix ? Yii::$app->id . '.' . $controllerRoute : $controllerRoute;
+            $controllerRoute = Yii::$app->getModule('auth')->useApplicationPrefix ? Yii::$app->id . '.' . $controllerRoute : $controllerRoute;
         } else {
             $controllerRoute = $this->getRuleName();
         }
@@ -348,12 +350,12 @@ class AuthBehavior extends Behavior
     public function getRuleName($action = null)
     {
         if (is_null($action)) {
-            $ruleName = str_replace('/', '.', \Yii::$app->controller->getRoute());
+            $ruleName = str_replace('/', '.', Yii::$app->controller->getRoute());
         } else {
             $module = Yii::$app->controller->module;
 
             $ruleName = $module->id == Yii::$app->id ? Yii::$app->controller->id . '.' . $action : $module->id . '.' . Yii::$app->controller->id . '.' . $action;
-            $ruleName = \Yii::$app->getModule('auth')->useApplicationPrefix ? Yii::$app->id . '.' . $ruleName : $ruleName;
+            $ruleName = Yii::$app->getModule('auth')->useApplicationPrefix ? Yii::$app->id . '.' . $ruleName : $ruleName;
         }
 
         return $ruleName;

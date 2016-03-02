@@ -55,9 +55,9 @@ class Module extends \yii\base\Module
     public $applicationControllers = [];
 
     /**
-     * @var array Array of user name that don't needs check rights. Be careful with this.
+     * @var array List of rbac roles that don't needs check rights. Be careful with this.
      */
-    public $admins = [];
+    public $admins = ['admin'];
     
     /**
      * @var array Access filter configuration for module's actions. For example,
