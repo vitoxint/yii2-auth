@@ -25,6 +25,8 @@ class AuthBehavior extends Behavior
      */
     private $_items = array();
 
+    private $_isAdmin = null;
+
     /**
      * Return thee parents and children of specific item or all items
      * @param string $itemName name of the item.
@@ -305,12 +307,14 @@ class AuthBehavior extends Behavior
         if (Yii::$app->user->isGuest) {
             return false;
         }
+
+        if ($this->_isAdmin === null) {
+            $module = Yii::$app->getModule('auth');
+            $userRoles = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->id));
+            $this->_isAdmin = array_intersect($userRoles, $module->admins);
+        }
         
-        $module = Yii::$app->getModule('auth');
-        $userRoles = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->id));
-        $isRbacAdmin = array_intersect($userRoles, $module->admins);
-        
-        return $isRbacAdmin;
+        return $this->_isAdmin;
     }
 
     /**
