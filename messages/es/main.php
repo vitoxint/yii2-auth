@@ -20,9 +20,9 @@
  */
 return array (
 	'Add' => 'Agregar',
-	'Add child' => 'Agregar hijo',
+	'Add child' => 'Agregar permiso hijo',
 	'Add {type}' => 'Agregar {type}',
-	'Ancestors' => 'Ancestros',
+	'Ancestors' => 'Ascendientes',
 	'Are you sure you want to delete this item?' => '¿Está seguro de querer eliminar este elemento?',
 	'Assign' => 'Asignar',
 	'Assign permission' => 'Asignar permiso',
@@ -53,7 +53,7 @@ return array (
 	'Select item' => 'Seleccionar elemento',
 	'System name' => 'Nombre de sistema',
 	'System name cannot be changed after creation.' => 'El nombre de sistema no puede cambiarse después de crearse.',
-	'This item does not have any ancestors.' => 'Este elemento no tiene ancestros.',
+	'This item does not have any ancestors.' => 'Este elemento no tiene ascendientes.',
 	'This item does not have any descendants.' => 'Este elemento no tiene descendientes.',
 	'This user does not have any assignments.' => 'Este usuario no tiene asignaciones.',
 	'Type' => 'Tipo',
