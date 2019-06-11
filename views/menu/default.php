@@ -12,7 +12,7 @@ $this->title= "Autentificación"
     'items' => [
         ['label' => Yii::t('auth.main', 'Assignments'), 'url' => ['assignment/index']],
         ['label' => Yii::t('auth.main', 'Roles'), 'url' => ['role/index']],
-        ['label' => Yii::t('auth.main', 'Permission'), 'url' => ['permission/index']],
+        ['label' => Yii::t('auth.main', 'Permissions'), 'url' => ['permission/index']],
     ],
     'options' => [
         'class' => 'nav-tabs',
