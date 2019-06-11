@@ -5,7 +5,7 @@
  */
 
 use yii\bootstrap\Nav;
-
+$this->title= "Autentificación"
 ?>
 
 <?= Nav::widget([
