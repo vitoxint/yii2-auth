@@ -255,11 +255,11 @@ abstract class ItemController extends AuthController
         }
 
         usort($direct, function ($a, $b) {
-            return $a->description - $b->description;
+            return $a->description <=> $b->description;
         });
 
         usort($indirect, function ($a, $b) {
-            return $a->description - $b->description;
+            return $a->description <=> $b->description;
         });
 
         return array_merge($direct, $indirect);
